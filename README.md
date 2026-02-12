@@ -54,6 +54,7 @@ You can also use Codex with an API key, but this requires [additional setup](htt
 - [**Codex Documentation**](https://developers.openai.com/codex)
 - [**Contributing**](./docs/contributing.md)
 - [**Installing & building**](./docs/install.md)
+- [**Local patched build verification (macOS arm64)**](./docs/macos-arm64-local-patch-verification.md)
 - [**Open source fund**](./docs/open-source-fund.md)
 
 This repository is licensed under the [Apache-2.0 License](LICENSE).
