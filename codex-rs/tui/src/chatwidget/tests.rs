@@ -1088,6 +1088,9 @@ async fn make_chatwidget_manual(
         unified_exec_processes: Vec::new(),
         agent_turn_running: false,
         mcp_startup_status: None,
+        orchestration_task_states: HashMap::new(),
+        orchestration_task_update_seq: 0,
+        orchestration_binding_warning: None,
         connectors_cache: ConnectorsCacheState::default(),
         connectors_prefetch_in_flight: false,
         interrupts: InterruptManager::new(),
@@ -5180,6 +5183,202 @@ async fn background_event_updates_status_header() {
     assert!(chat.bottom_pane.status_indicator_visible());
     assert_eq!(chat.current_status_header, "Waiting for `vim`");
     assert!(drain_insert_history(&mut rx).is_empty());
+}
+
+#[tokio::test]
+async fn task_complete_keeps_idle_status_visible() {
+    let (mut chat, _rx, _op_rx) = make_chatwidget_manual(None).await;
+
+    chat.on_task_started();
+    assert!(chat.bottom_pane.is_task_running());
+
+    chat.on_task_complete(None, false);
+
+    assert!(!chat.bottom_pane.is_task_running());
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should stay visible when idle");
+    assert_eq!(status.header(), IDLE_STATUS_HEADER);
+}
+
+#[tokio::test]
+async fn orchestration_task_state_controls_running_and_idle_status() {
+    let (mut chat, _rx, _op_rx) = make_chatwidget_manual(None).await;
+
+    chat.set_orchestration_task_state(true, Some("Running targeted tests".to_string()));
+    assert!(chat.bottom_pane.is_task_running());
+    let running_status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should be visible while orchestration is running");
+    assert_eq!(running_status.header(), "Running targeted tests");
+
+    chat.set_orchestration_task_state(false, None);
+    assert!(!chat.bottom_pane.is_task_running());
+    let idle_status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should stay visible after orchestration becomes idle");
+    assert_eq!(idle_status.header(), IDLE_STATUS_HEADER);
+}
+
+#[tokio::test]
+async fn orchestration_run_ids_keep_running_until_all_end() {
+    let (mut chat, _rx, _op_rx) = make_chatwidget_manual(None).await;
+
+    chat.begin_orchestration_task_state(
+        "run-a".to_string(),
+        Some("Running batch A".to_string()),
+        Some("phase 1".to_string()),
+    );
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should be visible for run-a");
+    assert_eq!(status.header(), "Running batch A");
+    assert_eq!(status.details(), Some("Phase 1"));
+
+    chat.begin_orchestration_task_state(
+        "run-b".to_string(),
+        Some("Running batch B".to_string()),
+        None,
+    );
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should be visible for run-b");
+    assert_eq!(status.header(), "Running batch B");
+
+    chat.end_orchestration_task_state("run-b".to_string());
+    assert!(chat.bottom_pane.is_task_running());
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should stay visible for remaining run");
+    assert_eq!(status.header(), "Running batch A");
+
+    chat.end_orchestration_task_state("run-a".to_string());
+    assert!(!chat.bottom_pane.is_task_running());
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should stay visible after all runs end");
+    assert_eq!(status.header(), IDLE_STATUS_HEADER);
+}
+
+#[tokio::test]
+async fn legacy_orchestration_boolean_does_not_cancel_named_runs() {
+    let (mut chat, _rx, _op_rx) = make_chatwidget_manual(None).await;
+
+    chat.begin_orchestration_task_state(
+        "run-a".to_string(),
+        Some("Running batch A".to_string()),
+        None,
+    );
+    chat.set_orchestration_task_state(true, Some("Legacy run".to_string()));
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should be visible for legacy run");
+    assert_eq!(status.header(), "Legacy run");
+
+    chat.set_orchestration_task_state(false, None);
+    assert!(chat.bottom_pane.is_task_running());
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should remain visible for named run");
+    assert_eq!(status.header(), "Running batch A");
+
+    chat.end_orchestration_task_state("run-a".to_string());
+    assert!(!chat.bottom_pane.is_task_running());
+}
+
+#[tokio::test]
+async fn orchestration_update_upserts_and_updates_details() {
+    let (mut chat, _rx, _op_rx) = make_chatwidget_manual(None).await;
+
+    chat.update_orchestration_task_state(
+        "run-a".to_string(),
+        Some("Executing plan".to_string()),
+        Some("phase 1".to_string()),
+    );
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should be visible after upsert update");
+    assert_eq!(status.header(), "Executing plan");
+    assert_eq!(status.details(), Some("Phase 1"));
+
+    chat.update_orchestration_task_state("run-a".to_string(), None, Some("phase 2".to_string()));
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should remain visible after update");
+    assert_eq!(status.header(), "Executing plan");
+    assert_eq!(status.details(), Some("Phase 2"));
+}
+
+#[tokio::test]
+async fn orchestration_binding_warning_appends_to_details() {
+    let (mut chat, _rx, _op_rx) = make_chatwidget_manual(None).await;
+
+    chat.begin_orchestration_task_state(
+        "run-a".to_string(),
+        Some("Running batch A".to_string()),
+        Some("phase 1".to_string()),
+    );
+    chat.set_orchestration_binding_warning(Some("iterm session rebound".to_string()));
+
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should stay visible while orchestration is running");
+    assert_eq!(status.header(), "Running batch A");
+    assert_eq!(
+        status.details(),
+        Some("Phase 1 | binding warning: iterm session rebound")
+    );
+}
+
+#[tokio::test]
+async fn orchestration_binding_warning_sets_details_when_empty() {
+    let (mut chat, _rx, _op_rx) = make_chatwidget_manual(None).await;
+
+    chat.begin_orchestration_task_state(
+        "run-a".to_string(),
+        Some("Running batch A".to_string()),
+        None,
+    );
+    chat.set_orchestration_binding_warning(Some("bridge detached".to_string()));
+
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should stay visible while orchestration is running");
+    assert_eq!(status.header(), "Running batch A");
+    assert_eq!(status.details(), Some("Binding warning: bridge detached"));
+}
+
+#[tokio::test]
+async fn orchestration_binding_warning_can_be_cleared() {
+    let (mut chat, _rx, _op_rx) = make_chatwidget_manual(None).await;
+
+    chat.begin_orchestration_task_state(
+        "run-a".to_string(),
+        Some("Running batch A".to_string()),
+        Some("phase 1".to_string()),
+    );
+    chat.set_orchestration_binding_warning(Some("bridge detached".to_string()));
+    chat.set_orchestration_binding_warning(None);
+
+    let status = chat
+        .bottom_pane
+        .status_widget()
+        .expect("status indicator should stay visible while orchestration is running");
+    assert_eq!(status.header(), "Running batch A");
+    assert_eq!(status.details(), Some("Phase 1"));
 }
 
 #[tokio::test]

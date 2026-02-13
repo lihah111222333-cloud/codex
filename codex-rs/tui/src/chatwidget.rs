@@ -17,8 +17,9 @@
 //!
 //! The bottom pane exposes a single "task running" indicator that drives the spinner and interrupt
 //! hints. This module treats that indicator as derived UI-busy state: it is set while an agent turn
-//! is in progress and while MCP server startup is in progress. Those lifecycles are tracked
-//! independently (`agent_turn_running` and `mcp_startup_status`) and synchronized via
+//! is in progress, while MCP server startup is in progress, and while orchestration explicitly marks
+//! work as running. Those lifecycles are tracked independently (`agent_turn_running`,
+//! `mcp_startup_status`, and `orchestration_task_states`) and synchronized via
 //! `update_task_running_state`.
 //!
 //! For preamble-capable models, assistant output may include commentary before
@@ -156,6 +157,9 @@ const PLAN_IMPLEMENTATION_YES: &str = "Yes, implement this plan";
 const PLAN_IMPLEMENTATION_NO: &str = "No, stay in Plan mode";
 const PLAN_IMPLEMENTATION_CODING_MESSAGE: &str = "Implement the plan.";
 const CONNECTORS_SELECTION_VIEW_ID: &str = "connectors-selection";
+const IDLE_STATUS_HEADER: &str = "Waiting for instructions";
+const LEGACY_ORCHESTRATION_RUN_ID: &str = "__legacy__";
+const DEFAULT_ORCHESTRATION_STATUS_HEADER: &str = "Running orchestration";
 
 use crate::app_event::AppEvent;
 use crate::app_event::ConnectorsSnapshot;
@@ -281,6 +285,13 @@ impl UnifiedExecWaitState {
 struct UnifiedExecWaitStreak {
     process_id: String,
     command_display: Option<String>,
+}
+
+#[derive(Clone, Debug, Default)]
+struct OrchestrationTaskState {
+    status_header: Option<String>,
+    status_details: Option<String>,
+    last_update_seq: u64,
 }
 
 impl UnifiedExecWaitStreak {
@@ -543,6 +554,15 @@ pub(crate) struct ChatWidget {
     /// bottom pane is treated as "running" while this is populated, even if no agent turn is
     /// currently executing.
     mcp_startup_status: Option<HashMap<String, McpStartupStatus>>,
+    /// External orchestration runs keyed by run id.
+    ///
+    /// A non-empty map means orchestration is running. Tracking by run id allows concurrent
+    /// orchestration tasks without boolean races.
+    orchestration_task_states: HashMap<String, OrchestrationTaskState>,
+    /// Monotonic sequence used to identify the most-recent orchestration update for status display.
+    orchestration_task_update_seq: u64,
+    /// Optional iTerm binding warning forwarded by orchestration.
+    orchestration_binding_warning: Option<String>,
     connectors_cache: ConnectorsCacheState,
     connectors_prefetch_in_flight: bool,
     // Queue of interruptive UI events deferred during an active write cycle
@@ -788,13 +808,142 @@ fn remap_placeholders_for_message(message: UserMessage, next_label: &mut usize) 
 }
 
 impl ChatWidget {
+    fn normalize_orchestration_run_id(run_id: String) -> String {
+        let trimmed = run_id.trim();
+        if trimmed.is_empty() {
+            String::from(LEGACY_ORCHESTRATION_RUN_ID)
+        } else {
+            trimmed.to_string()
+        }
+    }
+
+    fn apply_orchestration_task_state_update(
+        &mut self,
+        run_id: String,
+        status_header: Option<String>,
+        status_details: Option<String>,
+    ) {
+        let normalized_run_id = Self::normalize_orchestration_run_id(run_id);
+        self.orchestration_task_update_seq = self.orchestration_task_update_seq.saturating_add(1);
+        let update_seq = self.orchestration_task_update_seq;
+        let state = self
+            .orchestration_task_states
+            .entry(normalized_run_id)
+            .or_default();
+        state.last_update_seq = update_seq;
+
+        if let Some(header) = status_header
+            && !header.trim().is_empty()
+        {
+            state.status_header = Some(header.trim().to_string());
+        }
+        if let Some(details) = status_details
+            && !details.trim().is_empty()
+        {
+            state.status_details = Some(details.trim().to_string());
+        }
+    }
+
     /// Synchronize the bottom-pane "task running" indicator with the current lifecycles.
     ///
     /// The bottom pane only has one running flag, but this module treats it as a derived state of
-    /// both the agent turn lifecycle and MCP startup lifecycle.
+    /// the agent turn lifecycle, MCP startup lifecycle, and orchestration lifecycle.
     fn update_task_running_state(&mut self) {
-        self.bottom_pane
-            .set_task_running(self.agent_turn_running || self.mcp_startup_status.is_some());
+        let orchestration_running = !self.orchestration_task_states.is_empty();
+        let running =
+            self.agent_turn_running || self.mcp_startup_status.is_some() || orchestration_running;
+        self.bottom_pane.set_task_running(running);
+        if running {
+            self.bottom_pane.set_interrupt_hint_visible(true);
+            if !self.agent_turn_running
+                && self.mcp_startup_status.is_none()
+                && let Some(state) = self
+                    .orchestration_task_states
+                    .values()
+                    .max_by_key(|state| state.last_update_seq)
+            {
+                let header = state
+                    .status_header
+                    .clone()
+                    .unwrap_or_else(|| String::from(DEFAULT_ORCHESTRATION_STATUS_HEADER));
+                let warning = self
+                    .orchestration_binding_warning
+                    .as_ref()
+                    .map(|text| text.trim())
+                    .filter(|text| !text.is_empty())
+                    .map(ToString::to_string);
+                let details = match (state.status_details.clone(), warning) {
+                    (Some(details), Some(warning)) => {
+                        Some(format!("{details} | binding warning: {warning}"))
+                    }
+                    (Some(details), None) => Some(details),
+                    (None, Some(warning)) => Some(format!("Binding warning: {warning}")),
+                    (None, None) => None,
+                };
+                self.set_status(header, details);
+            }
+        } else {
+            self.bottom_pane.ensure_status_indicator();
+            self.bottom_pane.pause_status_timer();
+            self.bottom_pane.set_interrupt_hint_visible(false);
+            self.set_status_header(String::from(IDLE_STATUS_HEADER));
+        }
+    }
+
+    pub(crate) fn begin_orchestration_task_state(
+        &mut self,
+        run_id: String,
+        status_header: Option<String>,
+        status_details: Option<String>,
+    ) {
+        self.apply_orchestration_task_state_update(run_id, status_header, status_details);
+        self.update_task_running_state();
+        self.request_redraw();
+    }
+
+    pub(crate) fn update_orchestration_task_state(
+        &mut self,
+        run_id: String,
+        status_header: Option<String>,
+        status_details: Option<String>,
+    ) {
+        self.apply_orchestration_task_state_update(run_id, status_header, status_details);
+        self.update_task_running_state();
+        self.request_redraw();
+    }
+
+    pub(crate) fn end_orchestration_task_state(&mut self, run_id: String) {
+        let normalized_run_id = Self::normalize_orchestration_run_id(run_id);
+        self.orchestration_task_states.remove(&normalized_run_id);
+        self.update_task_running_state();
+        self.request_redraw();
+    }
+
+    pub(crate) fn set_orchestration_binding_warning(&mut self, warning: Option<String>) {
+        self.orchestration_binding_warning = warning
+            .map(|text| text.trim().to_string())
+            .filter(|text| !text.is_empty());
+        self.update_task_running_state();
+        self.request_redraw();
+    }
+
+    pub(crate) fn set_orchestration_task_state(
+        &mut self,
+        running: bool,
+        status_header: Option<String>,
+    ) {
+        if running {
+            self.apply_orchestration_task_state_update(
+                String::from(LEGACY_ORCHESTRATION_RUN_ID),
+                status_header,
+                None,
+            );
+        } else {
+            self.orchestration_task_states
+                .remove(LEGACY_ORCHESTRATION_RUN_ID);
+        }
+        self.update_task_running_state();
+        self.request_redraw();
     }
 
     fn restore_reasoning_status_header(&mut self) {
@@ -2643,6 +2792,9 @@ impl ChatWidget {
             unified_exec_processes: Vec::new(),
             agent_turn_running: false,
             mcp_startup_status: None,
+            orchestration_task_states: HashMap::new(),
+            orchestration_task_update_seq: 0,
+            orchestration_binding_warning: None,
             connectors_cache: ConnectorsCacheState::default(),
             connectors_prefetch_in_flight: false,
             interrupts: InterruptManager::new(),
@@ -2808,6 +2960,9 @@ impl ChatWidget {
             unified_exec_processes: Vec::new(),
             agent_turn_running: false,
             mcp_startup_status: None,
+            orchestration_task_states: HashMap::new(),
+            orchestration_task_update_seq: 0,
+            orchestration_binding_warning: None,
             connectors_cache: ConnectorsCacheState::default(),
             connectors_prefetch_in_flight: false,
             interrupts: InterruptManager::new(),
@@ -2962,6 +3117,9 @@ impl ChatWidget {
             unified_exec_processes: Vec::new(),
             agent_turn_running: false,
             mcp_startup_status: None,
+            orchestration_task_states: HashMap::new(),
+            orchestration_task_update_seq: 0,
+            orchestration_binding_warning: None,
             connectors_cache: ConnectorsCacheState::default(),
             connectors_prefetch_in_flight: false,
             interrupts: InterruptManager::new(),

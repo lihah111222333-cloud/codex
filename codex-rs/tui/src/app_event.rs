@@ -151,6 +151,53 @@ pub(crate) enum AppEvent {
     /// Update the current personality in the running app and widget.
     UpdatePersonality(Personality),
 
+    /// Update orchestration-controlled task running state and optional status header.
+    #[allow(dead_code)]
+    SetOrchestrationTaskState {
+        running: bool,
+        status_header: Option<String>,
+    },
+
+    /// Begin a tracked orchestration run identified by `run_id`.
+    ///
+    /// `run_id` allows concurrent orchestration runs to coexist without racing a shared boolean.
+    /// Optional header/details text is used for the status indicator when orchestration is the
+    /// active busy source.
+    #[allow(dead_code)]
+    BeginOrchestrationTaskState {
+        run_id: String,
+        status_header: Option<String>,
+        status_details: Option<String>,
+    },
+
+    /// Update a tracked orchestration run.
+    ///
+    /// If `run_id` is unknown, the run is created (upsert semantics) so out-of-order delivery does
+    /// not wedge the UI in idle state.
+    #[allow(dead_code)]
+    UpdateOrchestrationTaskState {
+        run_id: String,
+        status_header: Option<String>,
+        status_details: Option<String>,
+    },
+
+    /// End a tracked orchestration run.
+    ///
+    /// The status indicator remains in running mode if any other tracked run is still active.
+    #[allow(dead_code)]
+    EndOrchestrationTaskState {
+        run_id: String,
+    },
+
+    /// Set or clear an orchestration-provided iTerm binding warning.
+    ///
+    /// When set, this warning is surfaced in orchestration status details while orchestration is
+    /// the active busy source.
+    #[allow(dead_code)]
+    SetOrchestrationBindingWarning {
+        warning: Option<String>,
+    },
+
     /// Persist the selected model and reasoning effort to the appropriate config.
     PersistModelSelection {
         model: String,

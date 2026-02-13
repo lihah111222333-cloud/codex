@@ -607,6 +607,7 @@ impl BottomPane {
                     ));
                 }
                 if let Some(status) = self.status.as_mut() {
+                    status.resume_timer();
                     status.set_interrupt_hint_visible(true);
                 }
                 self.sync_status_inline_message();
@@ -640,6 +641,13 @@ impl BottomPane {
     pub(crate) fn set_interrupt_hint_visible(&mut self, visible: bool) {
         if let Some(status) = self.status.as_mut() {
             status.set_interrupt_hint_visible(visible);
+            self.request_redraw();
+        }
+    }
+
+    pub(crate) fn pause_status_timer(&mut self) {
+        if let Some(status) = self.status.as_mut() {
+            status.pause_timer();
             self.request_redraw();
         }
     }

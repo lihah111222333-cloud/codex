@@ -1645,6 +1645,41 @@ impl App {
             AppEvent::UpdatePersonality(personality) => {
                 self.on_update_personality(personality);
             }
+            AppEvent::SetOrchestrationTaskState {
+                running,
+                status_header,
+            } => {
+                self.chat_widget
+                    .set_orchestration_task_state(running, status_header);
+            }
+            AppEvent::BeginOrchestrationTaskState {
+                run_id,
+                status_header,
+                status_details,
+            } => {
+                self.chat_widget.begin_orchestration_task_state(
+                    run_id,
+                    status_header,
+                    status_details,
+                );
+            }
+            AppEvent::UpdateOrchestrationTaskState {
+                run_id,
+                status_header,
+                status_details,
+            } => {
+                self.chat_widget.update_orchestration_task_state(
+                    run_id,
+                    status_header,
+                    status_details,
+                );
+            }
+            AppEvent::EndOrchestrationTaskState { run_id } => {
+                self.chat_widget.end_orchestration_task_state(run_id);
+            }
+            AppEvent::SetOrchestrationBindingWarning { warning } => {
+                self.chat_widget.set_orchestration_binding_warning(warning);
+            }
             AppEvent::OpenReasoningPopup { model } => {
                 self.chat_widget.open_reasoning_popup(model);
             }
