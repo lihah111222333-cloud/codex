@@ -1098,7 +1098,7 @@ async fn make_chatwidget_manual(
         interrupts: InterruptManager::new(),
         reasoning_buffer: String::new(),
         full_reasoning_buffer: String::new(),
-        current_status_header: String::from("Working"),
+        current_status_header: String::from(WORKING_STATUS_HEADER),
         retry_status_header: None,
         pending_status_indicator_restore: false,
         thread_id: None,
@@ -2854,10 +2854,7 @@ async fn unified_exec_wait_status_header_updates_on_late_command_display() {
     });
 
     assert!(chat.active_cell.is_none());
-    assert_eq!(
-        chat.current_status_header,
-        "Waiting for background terminal · sleep 5"
-    );
+    assert_eq!(chat.current_status_header, "等待后台终端 · sleep 5");
 }
 
 #[tokio::test]
@@ -2868,10 +2865,7 @@ async fn unified_exec_waiting_multiple_empty_snapshots() {
 
     terminal_interaction(&mut chat, "call-wait-1a", "proc-1", "");
     terminal_interaction(&mut chat, "call-wait-1b", "proc-1", "");
-    assert_eq!(
-        chat.current_status_header,
-        "Waiting for background terminal · just fix"
-    );
+    assert_eq!(chat.current_status_header, "等待后台终端 · just fix");
 
     chat.handle_codex_event(Event {
         id: "turn-wait-1".into(),
@@ -2914,10 +2908,7 @@ async fn unified_exec_non_empty_then_empty_snapshots() {
 
     terminal_interaction(&mut chat, "call-wait-3a", "proc-3", "pwd\n");
     terminal_interaction(&mut chat, "call-wait-3b", "proc-3", "");
-    assert_eq!(
-        chat.current_status_header,
-        "Waiting for background terminal · just fix"
-    );
+    assert_eq!(chat.current_status_header, "等待后台终端 · just fix");
     let pre_cells = drain_insert_history(&mut rx);
     let active_combined = pre_cells
         .iter()
@@ -5643,7 +5634,7 @@ async fn orchestration_binding_warning_appends_to_details() {
     assert_eq!(status.header(), "Running batch A");
     assert_eq!(
         status.details(),
-        Some("Phase 1 | binding warning: iterm session rebound")
+        Some("Phase 1 | 绑定警告: iterm session rebound")
     );
 }
 
@@ -5663,7 +5654,7 @@ async fn orchestration_binding_warning_sets_details_when_empty() {
         .status_widget()
         .expect("status indicator should stay visible while orchestration is running");
     assert_eq!(status.header(), "Running batch A");
-    assert_eq!(status.details(), Some("Binding warning: bridge detached"));
+    assert_eq!(status.details(), Some("绑定警告: bridge detached"));
 }
 
 #[tokio::test]
@@ -6348,7 +6339,7 @@ async fn stream_recovery_restores_previous_status_header() {
         .bottom_pane
         .status_widget()
         .expect("status indicator should be visible");
-    assert_eq!(status.header(), "Working");
+    assert_eq!(status.header(), WORKING_STATUS_HEADER);
     assert_eq!(status.details(), None);
     assert!(chat.retry_status_header.is_none());
 }

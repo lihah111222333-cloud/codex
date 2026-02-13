@@ -1,0 +1,610 @@
+diff --git a/codex-rs/tui/src/bottom_pane/mod.rs b/codex-rs/tui/src/bottom_pane/mod.rs
+index 9bd7e48c0..f6f9fcf86 100644
+--- a/codex-rs/tui/src/bottom_pane/mod.rs
++++ b/codex-rs/tui/src/bottom_pane/mod.rs
+@@ -520,7 +520,7 @@ impl BottomPane {
+         self.request_redraw();
+     }
+ 
+-    /// Update the status indicator header (defaults to "Working") and details below it.
++    /// Update the status indicator header (defaults to "工作中") and details below it.
+     ///
+     /// Passing `None` clears any existing details. No-ops if the status indicator is not active.
+     pub(crate) fn update_status(&mut self, header: String, details: Option<String>) {
+@@ -1054,7 +1054,7 @@ mod tests {
+             r0.push(buf[(x, 0)].symbol().chars().next().unwrap_or(' '));
+         }
+         assert!(
+-            !r0.contains("Working"),
++            !r0.contains("工作中"),
+             "overlay should not render above modal"
+         );
+     }
+@@ -1094,7 +1094,7 @@ mod tests {
+             "no active modal view after denial"
+         );
+ 
+-        // Render and ensure the top row includes the Working header and a composer line below.
++        // Render and ensure the top row includes the 工作中 header and a composer line below.
+         // Give the animation thread a moment to tick.
+         std::thread::sleep(Duration::from_millis(120));
+         let area = Rect::new(0, 0, 40, 6);
+@@ -1104,9 +1104,10 @@ mod tests {
+         for x in 0..area.width {
+             row0.push(buf[(x, 0)].symbol().chars().next().unwrap_or(' '));
+         }
++        let compact_row0 = row0.replace(' ', "");
+         assert!(
+-            row0.contains("Working"),
+-            "expected Working header after denial on row 0: {row0:?}"
++            compact_row0.contains("工作中"),
++            "expected 工作中 header after denial on row 0: {row0:?}"
+         );
+ 
+         // Composer placeholder should be visible somewhere below.
+@@ -1151,7 +1152,8 @@ mod tests {
+         pane.render(area, &mut buf);
+ 
+         let bufs = snapshot_buffer(&buf);
+-        assert!(bufs.contains("• Working"), "expected Working header");
++        let compact_bufs = bufs.replace(' ', "");
++        assert!(compact_bufs.contains("•工作中"), "expected 工作中 header");
+     }
+ 
+     #[test]
+@@ -1234,7 +1236,8 @@ mod tests {
+ 
+         let area = Rect::new(0, 0, width, after);
+         let rendered = render_snapshot(&pane, area);
+-        assert!(rendered.contains("background terminal running · /ps to view"));
++        let compact_rendered = rendered.replace(' ', "");
++        assert!(compact_rendered.contains("后台终端运行中·/ps查看"));
+     }
+ 
+     #[test]
+@@ -1254,7 +1257,7 @@ mod tests {
+ 
+         pane.set_task_running(true);
+         pane.update_status(
+-            "Working".to_string(),
++            "工作中".to_string(),
+             Some("First detail line\nSecond detail line".to_string()),
+         );
+         pane.set_queued_user_messages(vec!["Queued follow-up question".to_string()]);
+diff --git a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_and_composer_fill_height_without_bottom_padding.snap b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_and_composer_fill_height_without_bottom_padding.snap
+index 494883e4c..900f9db44 100644
+--- a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_and_composer_fill_height_without_bottom_padding.snap
++++ b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_and_composer_fill_height_without_bottom_padding.snap
+@@ -2,7 +2,7 @@
+ source: tui/src/bottom_pane/mod.rs
+ expression: "render_snapshot(&pane, area)"
+ ---
+-• Working (0s • esc to interru
++• 工 作 中  (0s • esc 可 中 断 )    
+                               
+                               
+ › Ask Codex to do anything    
+diff --git a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_and_queued_messages_snapshot.snap b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_and_queued_messages_snapshot.snap
+index a82f6512c..69a02239b 100644
+--- a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_and_queued_messages_snapshot.snap
++++ b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_and_queued_messages_snapshot.snap
+@@ -2,7 +2,7 @@
+ source: tui/src/bottom_pane/mod.rs
+ expression: "render_snapshot(&pane, area)"
+ ---
+-• Working (0s • esc to interrupt)               
++• 工 作 中  (0s • esc 可 中 断 )                      
+                                                 
+   ↳ Queued follow-up question                   
+     ⌥ + ↑ edit                                  
+diff --git a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_only_snapshot.snap b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_only_snapshot.snap
+index 136c35805..4f147980d 100644
+--- a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_only_snapshot.snap
++++ b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_only_snapshot.snap
+@@ -2,7 +2,7 @@
+ source: tui/src/bottom_pane/mod.rs
+ expression: "render_snapshot(&pane, area)"
+ ---
+-• Working (0s • esc to interrupt)               
++• 工 作 中  (0s • esc 可 中 断 )                      
+                                                 
+                                                 
+ › Ask Codex to do anything                      
+diff --git a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_with_details_and_queued_messages_snapshot.snap b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_with_details_and_queued_messages_snapshot.snap
+index b714c69d8..ff5022929 100644
+--- a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_with_details_and_queued_messages_snapshot.snap
++++ b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__tests__status_with_details_and_queued_messages_snapshot.snap
+@@ -2,7 +2,7 @@
+ source: tui/src/bottom_pane/mod.rs
+ expression: "render_snapshot(&pane, area)"
+ ---
+-• Working (0s • esc to interrupt)               
++• 工 作 中  (0s • esc 可 中 断 )                      
+   └ First detail line                           
+     Second detail line                          
+                                                 
+diff --git a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__unified_exec_footer__tests__render_many_sessions.snap b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__unified_exec_footer__tests__render_many_sessions.snap
+index b1c3b5919..ea1c98b0d 100644
+--- a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__unified_exec_footer__tests__render_many_sessions.snap
++++ b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__unified_exec_footer__tests__render_many_sessions.snap
+@@ -5,9 +5,32 @@ expression: "format!(\"{buf:?}\")"
+ Buffer {
+     area: Rect { x: 0, y: 0, width: 50, height: 1 },
+     content: [
+-        "  123 background terminals running · /ps to view ·",
++        "  123 个后台终端运行中 · /ps 查看 · /clean 关闭   ", // hidden by multi-width symbols: [(7, " "), (9, " "), (11, " "), (13, " "), (15, " "), (17, " "), (19, " "), (21, " "), (30, " "), (32, " "), (44, " "), (46, " ")]
+     ],
+     styles: [
+         x: 0, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 7, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 8, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 9, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 10, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 11, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 12, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 13, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 14, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 15, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 16, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 17, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 18, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 19, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 20, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 21, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 22, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 30, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 31, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 32, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 33, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 44, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 45, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 46, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+     ]
+ }
+diff --git a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__unified_exec_footer__tests__render_more_sessions.snap b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__unified_exec_footer__tests__render_more_sessions.snap
+index 26c16791c..5297ff59f 100644
+--- a/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__unified_exec_footer__tests__render_more_sessions.snap
++++ b/codex-rs/tui/src/bottom_pane/snapshots/codex_tui__bottom_pane__unified_exec_footer__tests__render_more_sessions.snap
+@@ -5,9 +5,32 @@ expression: "format!(\"{buf:?}\")"
+ Buffer {
+     area: Rect { x: 0, y: 0, width: 50, height: 1 },
+     content: [
+-        "  1 background terminal running · /ps to view · /c",
++        "  1 个后台终端运行中 · /ps 查看 · /clean 关闭     ", // hidden by multi-width symbols: [(5, " "), (7, " "), (9, " "), (11, " "), (13, " "), (15, " "), (17, " "), (19, " "), (28, " "), (30, " "), (42, " "), (44, " ")]
+     ],
+     styles: [
+         x: 0, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 5, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 6, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 7, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 8, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 9, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 10, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 11, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 12, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 13, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 14, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 15, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 16, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 17, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 18, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 19, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 20, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 28, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 29, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 30, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 31, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 42, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
++        x: 43, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
++        x: 44, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+     ]
+ }
+diff --git a/codex-rs/tui/src/bottom_pane/unified_exec_footer.rs b/codex-rs/tui/src/bottom_pane/unified_exec_footer.rs
+index f0b7afcaf..0e9453015 100644
+--- a/codex-rs/tui/src/bottom_pane/unified_exec_footer.rs
++++ b/codex-rs/tui/src/bottom_pane/unified_exec_footer.rs
+@@ -48,10 +48,7 @@ impl UnifiedExecFooter {
+         }
+ 
+         let count = self.processes.len();
+-        let plural = if count == 1 { "" } else { "s" };
+-        Some(format!(
+-            "{count} background terminal{plural} running · /ps to view · /clean to close"
+-        ))
++        Some(format!("{count} 个后台终端运行中 · /ps 查看 · /clean 关闭"))
+     }
+ 
+     fn render_lines(&self, width: u16) -> Vec<Line<'static>> {
+diff --git a/codex-rs/tui/src/chatwidget.rs b/codex-rs/tui/src/chatwidget.rs
+index 832d7d8de..fc30ca262 100644
+--- a/codex-rs/tui/src/chatwidget.rs
++++ b/codex-rs/tui/src/chatwidget.rs
+@@ -157,9 +157,11 @@ const PLAN_IMPLEMENTATION_YES: &str = "Yes, implement this plan";
+ const PLAN_IMPLEMENTATION_NO: &str = "No, stay in Plan mode";
+ const PLAN_IMPLEMENTATION_CODING_MESSAGE: &str = "Implement the plan.";
+ const CONNECTORS_SELECTION_VIEW_ID: &str = "connectors-selection";
+-const IDLE_STATUS_HEADER: &str = "Waiting for instructions";
++const WORKING_STATUS_HEADER: &str = "工作中";
++const IDLE_STATUS_HEADER: &str = "等待指示";
+ const LEGACY_ORCHESTRATION_RUN_ID: &str = "__legacy__";
+-const DEFAULT_ORCHESTRATION_STATUS_HEADER: &str = "Running orchestration";
++const DEFAULT_ORCHESTRATION_STATUS_HEADER: &str = "编排执行中";
++const ORCHESTRATION_BINDING_WARNING_LABEL: &str = "绑定警告";
+ 
+ use crate::app_event::AppEvent;
+ use crate::app_event::ConnectorsSnapshot;
+@@ -864,11 +866,13 @@ impl ChatWidget {
+                     .filter(|text| !text.is_empty())
+                     .map(ToString::to_string);
+                 let details = match (state.status_details.clone(), warning) {
+-                    (Some(details), Some(warning)) => {
+-                        Some(format!("{details} | binding warning: {warning}"))
+-                    }
++                    (Some(details), Some(warning)) => Some(format!(
++                        "{details} | {ORCHESTRATION_BINDING_WARNING_LABEL}: {warning}"
++                    )),
+                     (Some(details), None) => Some(details),
+-                    (None, Some(warning)) => Some(format!("Binding warning: {warning}")),
++                    (None, Some(warning)) => {
++                        Some(format!("{ORCHESTRATION_BINDING_WARNING_LABEL}: {warning}"))
++                    }
+                     (None, None) => None,
+                 };
+                 self.set_status(header, details);
+@@ -941,7 +945,7 @@ impl ChatWidget {
+         if let Some(header) = extract_first_bold(&self.reasoning_buffer) {
+             self.set_status_header(header);
+         } else if self.bottom_pane.is_task_running() {
+-            self.set_status_header(String::from("Working"));
++            self.set_status_header(String::from(WORKING_STATUS_HEADER));
+         }
+     }
+ 
+@@ -1440,7 +1444,7 @@ impl ChatWidget {
+         self.retry_status_header = None;
+         self.pending_status_indicator_restore = false;
+         self.bottom_pane.set_interrupt_hint_visible(true);
+-        self.set_status_header(String::from("Working"));
++        self.set_status_header(String::from(WORKING_STATUS_HEADER));
+         self.full_reasoning_buffer.clear();
+         self.reasoning_buffer.clear();
+         self.request_redraw();
+@@ -1793,11 +1797,11 @@ impl ChatWidget {
+                 }
+                 let header = if total > 1 {
+                     format!(
+-                        "Starting MCP servers ({completed}/{total}): {}",
++                        "正在启动 MCP 服务器 ({completed}/{total})：{}",
+                         to_show.join(", ")
+                     )
+                 } else {
+-                    format!("Booting MCP server: {first}")
++                    format!("正在启动 MCP 服务器：{first}")
+                 };
+                 self.set_status_header(header);
+             }
+@@ -2013,9 +2017,9 @@ impl ChatWidget {
+             self.bottom_pane.ensure_status_indicator();
+             self.bottom_pane.set_interrupt_hint_visible(true);
+             let header = if let Some(command) = &command_display {
+-                format!("Waiting for background terminal · {command}")
++                format!("等待后台终端 · {command}")
+             } else {
+-                "Waiting for background terminal".to_string()
++                "等待后台终端".to_string()
+             };
+             self.set_status_header(header);
+             match &mut self.unified_exec_wait_streak {
+@@ -2773,7 +2777,7 @@ impl ChatWidget {
+             interrupts: InterruptManager::new(),
+             reasoning_buffer: String::new(),
+             full_reasoning_buffer: String::new(),
+-            current_status_header: String::from("Working"),
++            current_status_header: String::from(WORKING_STATUS_HEADER),
+             retry_status_header: None,
+             pending_status_indicator_restore: false,
+             thread_id: None,
+@@ -2941,7 +2945,7 @@ impl ChatWidget {
+             interrupts: InterruptManager::new(),
+             reasoning_buffer: String::new(),
+             full_reasoning_buffer: String::new(),
+-            current_status_header: String::from("Working"),
++            current_status_header: String::from(WORKING_STATUS_HEADER),
+             retry_status_header: None,
+             pending_status_indicator_restore: false,
+             thread_id: None,
+@@ -3098,7 +3102,7 @@ impl ChatWidget {
+             interrupts: InterruptManager::new(),
+             reasoning_buffer: String::new(),
+             full_reasoning_buffer: String::new(),
+-            current_status_header: String::from("Working"),
++            current_status_header: String::from(WORKING_STATUS_HEADER),
+             retry_status_header: None,
+             pending_status_indicator_restore: false,
+             thread_id: None,
+@@ -3265,7 +3269,7 @@ impl ChatWidget {
+                         // Reset any reasoning header only when we are actually submitting a turn.
+                         self.reasoning_buffer.clear();
+                         self.full_reasoning_buffer.clear();
+-                        self.set_status_header(String::from("Working"));
++                        self.set_status_header(String::from(WORKING_STATUS_HEADER));
+                         self.submit_user_message(user_message);
+                     } else {
+                         self.queue_user_message(user_message);
+@@ -3676,7 +3680,7 @@ impl ChatWidget {
+                 if self.is_session_configured() {
+                     self.reasoning_buffer.clear();
+                     self.full_reasoning_buffer.clear();
+-                    self.set_status_header(String::from("Working"));
++                    self.set_status_header(String::from(WORKING_STATUS_HEADER));
+                     self.submit_user_message(user_message);
+                 } else {
+                     self.queue_user_message(user_message);
+diff --git a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__chatwidget_exec_and_status_layout_vt100_snapshot.snap b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__chatwidget_exec_and_status_layout_vt100_snapshot.snap
+index 52779fd84..100f1d167 100644
+--- a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__chatwidget_exec_and_status_layout_vt100_snapshot.snap
++++ b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__chatwidget_exec_and_status_layout_vt100_snapshot.snap
+@@ -36,7 +36,7 @@ expression: term.backend().vt100().screen().contents()
+   └ Search Change Approved
+     Read diff_render.rs
+ 
+-• Investigating rendering code (0s • esc to interrupt)
++• Investigating rendering code (0s • esc 可中断)
+ 
+ 
+ › Summarize recent commits
+diff --git a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__chatwidget_tall.snap b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__chatwidget_tall.snap
+index ebffeb8f5..6c2a1aca7 100644
+--- a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__chatwidget_tall.snap
++++ b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__chatwidget_tall.snap
+@@ -3,7 +3,7 @@ source: tui/src/chatwidget/tests.rs
+ expression: term.backend().vt100().screen().contents()
+ ---
+ 
+-• Working (0s • esc to interrupt)
++• 工作中 (0s • esc 可中断)
+ 
+   ↳ Hello, world! 0
+   ↳ Hello, world! 1
+diff --git a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__mcp_startup_header_booting.snap b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__mcp_startup_header_booting.snap
+index 6074ed1f2..4b931ed40 100644
+--- a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__mcp_startup_header_booting.snap
++++ b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__mcp_startup_header_booting.snap
+@@ -3,7 +3,7 @@ source: tui/src/chatwidget/tests.rs
+ expression: terminal.backend()
+ ---
+ "                                                                                "
+-"• Booting MCP server: alpha (0s • esc to interrupt)                             "
++"• 正在启动 MCP 服务器：alpha (0s • esc 可中断)                                  " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " "), (9, " "), (16, " "), (18, " "), (20, " "), (22, " "), (40, " "), (42, " "), (44, " ")]
+ "                                                                                "
+ "                                                                                "
+ "› Ask Codex to do anything                                                      "
+diff --git a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__preamble_keeps_working_status.snap b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__preamble_keeps_working_status.snap
+index b240e4b5f..ad4d16e7e 100644
+--- a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__preamble_keeps_working_status.snap
++++ b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__preamble_keeps_working_status.snap
+@@ -3,7 +3,7 @@ source: tui/src/chatwidget/tests.rs
+ expression: terminal.backend()
+ ---
+ "                                                                                "
+-"• Working (0s • esc to interrupt)                                               "
++"• 工作中 (0s • esc 可中断)                                                      " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " "), (20, " "), (22, " "), (24, " ")]
+ "                                                                                "
+ "                                                                                "
+ "› Ask Codex to do anything                                                      "
+diff --git a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__review_queues_user_messages_snapshot.snap b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__review_queues_user_messages_snapshot.snap
+index ce28175ea..f9533583b 100644
+--- a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__review_queues_user_messages_snapshot.snap
++++ b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__review_queues_user_messages_snapshot.snap
+@@ -12,7 +12,7 @@ expression: term.backend().vt100().screen().contents()
+ 
+ 
+ 
+-• Working (0s • esc to interrupt)
++• 工作中 (0s • esc 可中断)
+ 
+   ↳ Queued while /review is running.
+     ⌥ + ↑ edit
+diff --git a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__status_widget_active.snap b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__status_widget_active.snap
+index 3acfd95ee..c215e8357 100644
+--- a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__status_widget_active.snap
++++ b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__status_widget_active.snap
+@@ -3,7 +3,7 @@ source: tui/src/chatwidget/tests.rs
+ expression: terminal.backend()
+ ---
+ "                                                                                "
+-"• Analyzing (0s • esc to interrupt)                                             "
++"• Analyzing (0s • esc 可中断)                                                   " Hidden by multi-width symbols: [(23, " "), (25, " "), (27, " ")]
+ "                                                                                "
+ "                                                                                "
+ "› Ask Codex to do anything                                                      "
+diff --git a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__unified_exec_begin_restores_working_status.snap b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__unified_exec_begin_restores_working_status.snap
+index 9976dc6ee..2baaa3c99 100644
+--- a/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__unified_exec_begin_restores_working_status.snap
++++ b/codex-rs/tui/src/chatwidget/snapshots/codex_tui__chatwidget__tests__unified_exec_begin_restores_working_status.snap
+@@ -3,7 +3,7 @@ source: tui/src/chatwidget/tests.rs
+ expression: terminal.backend()
+ ---
+ "                                                                                "
+-"• Working (0s • esc to interrupt) · 1 background terminal running · /ps to view "
++"• 工作中 (0s • esc 可中断) · 1 个后台终端运行中 · /ps 查看 · /clean 关闭        " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " "), (20, " "), (22, " "), (24, " "), (32, " "), (34, " "), (36, " "), (38, " "), (40, " "), (42, " "), (44, " "), (46, " "), (55, " "), (57, " "), (69, " "), (71, " ")]
+ "                                                                                "
+ "                                                                                "
+ "› Ask Codex to do anything                                                      "
+diff --git a/codex-rs/tui/src/chatwidget/tests.rs b/codex-rs/tui/src/chatwidget/tests.rs
+index 41b2e7046..24b901c5a 100644
+--- a/codex-rs/tui/src/chatwidget/tests.rs
++++ b/codex-rs/tui/src/chatwidget/tests.rs
+@@ -1098,7 +1098,7 @@ async fn make_chatwidget_manual(
+         interrupts: InterruptManager::new(),
+         reasoning_buffer: String::new(),
+         full_reasoning_buffer: String::new(),
+-        current_status_header: String::from("Working"),
++        current_status_header: String::from(WORKING_STATUS_HEADER),
+         retry_status_header: None,
+         pending_status_indicator_restore: false,
+         thread_id: None,
+@@ -2854,10 +2854,7 @@ async fn unified_exec_wait_status_header_updates_on_late_command_display() {
+     });
+ 
+     assert!(chat.active_cell.is_none());
+-    assert_eq!(
+-        chat.current_status_header,
+-        "Waiting for background terminal · sleep 5"
+-    );
++    assert_eq!(chat.current_status_header, "等待后台终端 · sleep 5");
+ }
+ 
+ #[tokio::test]
+@@ -2868,10 +2865,7 @@ async fn unified_exec_waiting_multiple_empty_snapshots() {
+ 
+     terminal_interaction(&mut chat, "call-wait-1a", "proc-1", "");
+     terminal_interaction(&mut chat, "call-wait-1b", "proc-1", "");
+-    assert_eq!(
+-        chat.current_status_header,
+-        "Waiting for background terminal · just fix"
+-    );
++    assert_eq!(chat.current_status_header, "等待后台终端 · just fix");
+ 
+     chat.handle_codex_event(Event {
+         id: "turn-wait-1".into(),
+@@ -2914,10 +2908,7 @@ async fn unified_exec_non_empty_then_empty_snapshots() {
+ 
+     terminal_interaction(&mut chat, "call-wait-3a", "proc-3", "pwd\n");
+     terminal_interaction(&mut chat, "call-wait-3b", "proc-3", "");
+-    assert_eq!(
+-        chat.current_status_header,
+-        "Waiting for background terminal · just fix"
+-    );
++    assert_eq!(chat.current_status_header, "等待后台终端 · just fix");
+     let pre_cells = drain_insert_history(&mut rx);
+     let active_combined = pre_cells
+         .iter()
+@@ -5643,7 +5634,7 @@ async fn orchestration_binding_warning_appends_to_details() {
+     assert_eq!(status.header(), "Running batch A");
+     assert_eq!(
+         status.details(),
+-        Some("Phase 1 | binding warning: iterm session rebound")
++        Some("Phase 1 | 绑定警告: iterm session rebound")
+     );
+ }
+ 
+@@ -5663,7 +5654,7 @@ async fn orchestration_binding_warning_sets_details_when_empty() {
+         .status_widget()
+         .expect("status indicator should stay visible while orchestration is running");
+     assert_eq!(status.header(), "Running batch A");
+-    assert_eq!(status.details(), Some("Binding warning: bridge detached"));
++    assert_eq!(status.details(), Some("绑定警告: bridge detached"));
+ }
+ 
+ #[tokio::test]
+@@ -6348,7 +6339,7 @@ async fn stream_recovery_restores_previous_status_header() {
+         .bottom_pane
+         .status_widget()
+         .expect("status indicator should be visible");
+-    assert_eq!(status.header(), "Working");
++    assert_eq!(status.header(), WORKING_STATUS_HEADER);
+     assert_eq!(status.details(), None);
+     assert!(chat.retry_status_header.is_none());
+ }
+diff --git a/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_truncated.snap b/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_truncated.snap
+index ba179808b..bbeeaa36b 100644
+--- a/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_truncated.snap
++++ b/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_truncated.snap
+@@ -2,5 +2,5 @@
+ source: tui/src/status_indicator_widget.rs
+ expression: terminal.backend()
+ ---
+-"• Working (0s • esc "
++"• 工作中 (0s • esc  " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " ")]
+ "                    "
+diff --git a/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_with_working_header.snap b/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_with_working_header.snap
+index 2b80830f8..53e2317c3 100644
+--- a/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_with_working_header.snap
++++ b/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_with_working_header.snap
+@@ -2,5 +2,5 @@
+ source: tui/src/status_indicator_widget.rs
+ expression: terminal.backend()
+ ---
+-"• Working (0s • esc to interrupt)                                               "
++"• 工作中 (0s • esc 可中断)                                                      " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " "), (20, " "), (22, " "), (24, " ")]
+ "                                                                                "
+diff --git a/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_wrapped_details_panama_two_lines.snap b/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_wrapped_details_panama_two_lines.snap
+index 565d5451f..dd82b48c9 100644
+--- a/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_wrapped_details_panama_two_lines.snap
++++ b/codex-rs/tui/src/snapshots/codex_tui__status_indicator_widget__tests__renders_wrapped_details_panama_two_lines.snap
+@@ -2,6 +2,6 @@
+ source: tui/src/status_indicator_widget.rs
+ expression: terminal.backend()
+ ---
+-"• Working (0s)                "
++"• 工作中 (0s)                 " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " ")]
+ "  └ A man a plan a canal      "
+ "    panama                    "
+diff --git a/codex-rs/tui/src/status_indicator_widget.rs b/codex-rs/tui/src/status_indicator_widget.rs
+index 94eb038ce..93b87f7c2 100644
+--- a/codex-rs/tui/src/status_indicator_widget.rs
++++ b/codex-rs/tui/src/status_indicator_widget.rs
+@@ -32,10 +32,12 @@ use crate::wrapping::word_wrap_lines;
+ 
+ const DETAILS_MAX_LINES: usize = 3;
+ const DETAILS_PREFIX: &str = "  └ ";
++const DEFAULT_STATUS_HEADER: &str = "工作中";
++const INTERRUPT_HINT_SUFFIX: &str = " 可中断)";
+ 
+ /// Displays a single-line in-progress status with optional wrapped details.
+ pub(crate) struct StatusIndicatorWidget {
+-    /// Animated header text (defaults to "Working").
++    /// Animated header text (defaults to "工作中").
+     header: String,
+     details: Option<String>,
+     /// Optional suffix rendered after the elapsed/interrupt segment.
+@@ -74,7 +76,7 @@ impl StatusIndicatorWidget {
+         animations_enabled: bool,
+     ) -> Self {
+         Self {
+-            header: String::from("Working"),
++            header: String::from(DEFAULT_STATUS_HEADER),
+             details: None,
+             inline_message: None,
+             show_interrupt_hint: true,
+@@ -104,7 +106,7 @@ impl StatusIndicatorWidget {
+             .map(|details| capitalize_first(details.trim_start()));
+     }
+ 
+-    /// Update the inline suffix text shown after `({elapsed} • esc to interrupt)`.
++    /// Update the inline suffix text shown after `({elapsed} • esc 可中断)`.
+     ///
+     /// Callers should provide plain, already-contextualized text. Passing
+     /// verbose status prose here can cause frequent width truncation and hide
+@@ -238,7 +240,7 @@ impl Renderable for StatusIndicatorWidget {
+             spans.extend(vec![
+                 format!("({pretty_elapsed} • ").dim(),
+                 key_hint::plain(KeyCode::Esc).into(),
+-                " to interrupt)".dim(),
++                INTERRUPT_HINT_SUFFIX.dim(),
+             ]);
+         } else {
+             spans.push(format!("({pretty_elapsed})").dim());
+diff --git "a/dev\346\226\207\346\241\243/multi-agent-orchestration-status-interface.md" "b/dev\346\226\207\346\241\243/multi-agent-orchestration-status-interface.md"
+index b79ce06de..4f7948883 100644
+--- "a/dev\346\226\207\346\241\243/multi-agent-orchestration-status-interface.md"
++++ "b/dev\346\226\207\346\241\243/multi-agent-orchestration-status-interface.md"
+@@ -9,7 +9,7 @@
+ 让 orchestration 流程可以主动控制底部状态条：
+ 
+ - orchestration 执行中：显示运行状态（如 `Running targeted tests`）
+-- orchestration 空闲：状态条仍然可见，不再隐藏，默认显示 `Waiting for instructions`
++- orchestration 空闲：状态条仍然可见，不再隐藏，默认显示 `等待指示`
+ - orchestration 并发执行：基于 `run_id` 跟踪，不再依赖单布尔位
+ 
+ ---
+@@ -193,7 +193,7 @@ app_event_tx.send(AppEvent::SetOrchestrationBindingWarning { warning: None });
+ 
+ ### 维度 F：空闲 UX 一致性
+ - 结果：通过
+-- 结论：空闲时状态条常显、计时器暂停、中断提示关闭、标题回落 `Waiting for instructions`
++- 结论：空闲时状态条常显、计时器暂停、中断提示关闭、标题回落 `等待指示`
+ 
+ ### 维度 G：可观测与调试
+ - 结果：部分通过

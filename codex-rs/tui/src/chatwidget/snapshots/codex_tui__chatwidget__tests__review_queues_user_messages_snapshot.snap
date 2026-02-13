@@ -12,7 +12,7 @@ expression: term.backend().vt100().screen().contents()
 
 
 
-• Working (0s • esc to interrupt)
+• 工作中 (0s • esc 可中断)
 
   ↳ Queued while /review is running.
     ⌥ + ↑ edit

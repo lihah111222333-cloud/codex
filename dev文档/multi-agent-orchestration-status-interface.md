@@ -9,7 +9,7 @@
 让 orchestration 流程可以主动控制底部状态条：
 
 - orchestration 执行中：显示运行状态（如 `Running targeted tests`）
-- orchestration 空闲：状态条仍然可见，不再隐藏，默认显示 `Waiting for instructions`
+- orchestration 空闲：状态条仍然可见，不再隐藏，默认显示 `等待指示`
 - orchestration 并发执行：基于 `run_id` 跟踪，不再依赖单布尔位
 
 ---
@@ -193,7 +193,7 @@ app_event_tx.send(AppEvent::SetOrchestrationBindingWarning { warning: None });
 
 ### 维度 F：空闲 UX 一致性
 - 结果：通过
-- 结论：空闲时状态条常显、计时器暂停、中断提示关闭、标题回落 `Waiting for instructions`
+- 结论：空闲时状态条常显、计时器暂停、中断提示关闭、标题回落 `等待指示`
 
 ### 维度 G：可观测与调试
 - 结果：部分通过

@@ -3,7 +3,7 @@ source: tui/src/chatwidget/tests.rs
 expression: terminal.backend()
 ---
 "                                                                                "
-"• Working (0s • esc to interrupt)                                               "
+"• 工作中 (0s • esc 可中断)                                                      " Hidden by multi-width symbols: [(3, " "), (5, " "), (7, " "), (20, " "), (22, " "), (24, " ")]
 "                                                                                "
 "                                                                                "
 "› Ask Codex to do anything                                                      "

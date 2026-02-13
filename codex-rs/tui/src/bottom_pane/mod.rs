@@ -520,7 +520,7 @@ impl BottomPane {
         self.request_redraw();
     }
 
-    /// Update the status indicator header (defaults to "Working") and details below it.
+    /// Update the status indicator header (defaults to "工作中") and details below it.
     ///
     /// Passing `None` clears any existing details. No-ops if the status indicator is not active.
     pub(crate) fn update_status(&mut self, header: String, details: Option<String>) {
@@ -1054,7 +1054,7 @@ mod tests {
             r0.push(buf[(x, 0)].symbol().chars().next().unwrap_or(' '));
         }
         assert!(
-            !r0.contains("Working"),
+            !r0.contains("工作中"),
             "overlay should not render above modal"
         );
     }
@@ -1094,7 +1094,7 @@ mod tests {
             "no active modal view after denial"
         );
 
-        // Render and ensure the top row includes the Working header and a composer line below.
+        // Render and ensure the top row includes the 工作中 header and a composer line below.
         // Give the animation thread a moment to tick.
         std::thread::sleep(Duration::from_millis(120));
         let area = Rect::new(0, 0, 40, 6);
@@ -1104,9 +1104,10 @@ mod tests {
         for x in 0..area.width {
             row0.push(buf[(x, 0)].symbol().chars().next().unwrap_or(' '));
         }
+        let compact_row0 = row0.replace(' ', "");
         assert!(
-            row0.contains("Working"),
-            "expected Working header after denial on row 0: {row0:?}"
+            compact_row0.contains("工作中"),
+            "expected 工作中 header after denial on row 0: {row0:?}"
         );
 
         // Composer placeholder should be visible somewhere below.
@@ -1151,7 +1152,8 @@ mod tests {
         pane.render(area, &mut buf);
 
         let bufs = snapshot_buffer(&buf);
-        assert!(bufs.contains("• Working"), "expected Working header");
+        let compact_bufs = bufs.replace(' ', "");
+        assert!(compact_bufs.contains("•工作中"), "expected 工作中 header");
     }
 
     #[test]
@@ -1234,7 +1236,8 @@ mod tests {
 
         let area = Rect::new(0, 0, width, after);
         let rendered = render_snapshot(&pane, area);
-        assert!(rendered.contains("background terminal running · /ps to view"));
+        let compact_rendered = rendered.replace(' ', "");
+        assert!(compact_rendered.contains("后台终端运行中·/ps查看"));
     }
 
     #[test]
@@ -1254,7 +1257,7 @@ mod tests {
 
         pane.set_task_running(true);
         pane.update_status(
-            "Working".to_string(),
+            "工作中".to_string(),
             Some("First detail line\nSecond detail line".to_string()),
         );
         pane.set_queued_user_messages(vec!["Queued follow-up question".to_string()]);

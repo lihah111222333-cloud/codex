@@ -32,10 +32,12 @@ use crate::wrapping::word_wrap_lines;
 
 const DETAILS_MAX_LINES: usize = 3;
 const DETAILS_PREFIX: &str = "  └ ";
+const DEFAULT_STATUS_HEADER: &str = "工作中";
+const INTERRUPT_HINT_SUFFIX: &str = " 可中断)";
 
 /// Displays a single-line in-progress status with optional wrapped details.
 pub(crate) struct StatusIndicatorWidget {
-    /// Animated header text (defaults to "Working").
+    /// Animated header text (defaults to "工作中").
     header: String,
     details: Option<String>,
     /// Optional suffix rendered after the elapsed/interrupt segment.
@@ -74,7 +76,7 @@ impl StatusIndicatorWidget {
         animations_enabled: bool,
     ) -> Self {
         Self {
-            header: String::from("Working"),
+            header: String::from(DEFAULT_STATUS_HEADER),
             details: None,
             inline_message: None,
             show_interrupt_hint: true,
@@ -104,7 +106,7 @@ impl StatusIndicatorWidget {
             .map(|details| capitalize_first(details.trim_start()));
     }
 
-    /// Update the inline suffix text shown after `({elapsed} • esc to interrupt)`.
+    /// Update the inline suffix text shown after `({elapsed} • esc 可中断)`.
     ///
     /// Callers should provide plain, already-contextualized text. Passing
     /// verbose status prose here can cause frequent width truncation and hide
@@ -238,7 +240,7 @@ impl Renderable for StatusIndicatorWidget {
             spans.extend(vec![
                 format!("({pretty_elapsed} • ").dim(),
                 key_hint::plain(KeyCode::Esc).into(),
-                " to interrupt)".dim(),
+                INTERRUPT_HINT_SUFFIX.dim(),
             ]);
         } else {
             spans.push(format!("({pretty_elapsed})").dim());

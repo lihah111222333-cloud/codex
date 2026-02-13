@@ -157,9 +157,11 @@ const PLAN_IMPLEMENTATION_YES: &str = "Yes, implement this plan";
 const PLAN_IMPLEMENTATION_NO: &str = "No, stay in Plan mode";
 const PLAN_IMPLEMENTATION_CODING_MESSAGE: &str = "Implement the plan.";
 const CONNECTORS_SELECTION_VIEW_ID: &str = "connectors-selection";
-const IDLE_STATUS_HEADER: &str = "Waiting for instructions";
+const WORKING_STATUS_HEADER: &str = "工作中";
+const IDLE_STATUS_HEADER: &str = "等待指示";
 const LEGACY_ORCHESTRATION_RUN_ID: &str = "__legacy__";
-const DEFAULT_ORCHESTRATION_STATUS_HEADER: &str = "Running orchestration";
+const DEFAULT_ORCHESTRATION_STATUS_HEADER: &str = "编排执行中";
+const ORCHESTRATION_BINDING_WARNING_LABEL: &str = "绑定警告";
 
 use crate::app_event::AppEvent;
 use crate::app_event::ConnectorsSnapshot;
@@ -864,11 +866,13 @@ impl ChatWidget {
                     .filter(|text| !text.is_empty())
                     .map(ToString::to_string);
                 let details = match (state.status_details.clone(), warning) {
-                    (Some(details), Some(warning)) => {
-                        Some(format!("{details} | binding warning: {warning}"))
-                    }
+                    (Some(details), Some(warning)) => Some(format!(
+                        "{details} | {ORCHESTRATION_BINDING_WARNING_LABEL}: {warning}"
+                    )),
                     (Some(details), None) => Some(details),
-                    (None, Some(warning)) => Some(format!("Binding warning: {warning}")),
+                    (None, Some(warning)) => {
+                        Some(format!("{ORCHESTRATION_BINDING_WARNING_LABEL}: {warning}"))
+                    }
                     (None, None) => None,
                 };
                 self.set_status(header, details);
@@ -941,7 +945,7 @@ impl ChatWidget {
         if let Some(header) = extract_first_bold(&self.reasoning_buffer) {
             self.set_status_header(header);
         } else if self.bottom_pane.is_task_running() {
-            self.set_status_header(String::from("Working"));
+            self.set_status_header(String::from(WORKING_STATUS_HEADER));
         }
     }
 
@@ -1440,7 +1444,7 @@ impl ChatWidget {
         self.retry_status_header = None;
         self.pending_status_indicator_restore = false;
         self.bottom_pane.set_interrupt_hint_visible(true);
-        self.set_status_header(String::from("Working"));
+        self.set_status_header(String::from(WORKING_STATUS_HEADER));
         self.full_reasoning_buffer.clear();
         self.reasoning_buffer.clear();
         self.request_redraw();
@@ -1793,11 +1797,11 @@ impl ChatWidget {
                 }
                 let header = if total > 1 {
                     format!(
-                        "Starting MCP servers ({completed}/{total}): {}",
+                        "正在启动 MCP 服务器 ({completed}/{total})：{}",
                         to_show.join(", ")
                     )
                 } else {
-                    format!("Booting MCP server: {first}")
+                    format!("正在启动 MCP 服务器：{first}")
                 };
                 self.set_status_header(header);
             }
@@ -2013,9 +2017,9 @@ impl ChatWidget {
             self.bottom_pane.ensure_status_indicator();
             self.bottom_pane.set_interrupt_hint_visible(true);
             let header = if let Some(command) = &command_display {
-                format!("Waiting for background terminal · {command}")
+                format!("等待后台终端 · {command}")
             } else {
-                "Waiting for background terminal".to_string()
+                "等待后台终端".to_string()
             };
             self.set_status_header(header);
             match &mut self.unified_exec_wait_streak {
@@ -2773,7 +2777,7 @@ impl ChatWidget {
             interrupts: InterruptManager::new(),
             reasoning_buffer: String::new(),
             full_reasoning_buffer: String::new(),
-            current_status_header: String::from("Working"),
+            current_status_header: String::from(WORKING_STATUS_HEADER),
             retry_status_header: None,
             pending_status_indicator_restore: false,
             thread_id: None,
@@ -2941,7 +2945,7 @@ impl ChatWidget {
             interrupts: InterruptManager::new(),
             reasoning_buffer: String::new(),
             full_reasoning_buffer: String::new(),
-            current_status_header: String::from("Working"),
+            current_status_header: String::from(WORKING_STATUS_HEADER),
             retry_status_header: None,
             pending_status_indicator_restore: false,
             thread_id: None,
@@ -3098,7 +3102,7 @@ impl ChatWidget {
             interrupts: InterruptManager::new(),
             reasoning_buffer: String::new(),
             full_reasoning_buffer: String::new(),
-            current_status_header: String::from("Working"),
+            current_status_header: String::from(WORKING_STATUS_HEADER),
             retry_status_header: None,
             pending_status_indicator_restore: false,
             thread_id: None,
@@ -3265,7 +3269,7 @@ impl ChatWidget {
                         // Reset any reasoning header only when we are actually submitting a turn.
                         self.reasoning_buffer.clear();
                         self.full_reasoning_buffer.clear();
-                        self.set_status_header(String::from("Working"));
+                        self.set_status_header(String::from(WORKING_STATUS_HEADER));
                         self.submit_user_message(user_message);
                     } else {
                         self.queue_user_message(user_message);
@@ -3676,7 +3680,7 @@ impl ChatWidget {
                 if self.is_session_configured() {
                     self.reasoning_buffer.clear();
                     self.full_reasoning_buffer.clear();
-                    self.set_status_header(String::from("Working"));
+                    self.set_status_header(String::from(WORKING_STATUS_HEADER));
                     self.submit_user_message(user_message);
                 } else {
                     self.queue_user_message(user_message);

@@ -5,9 +5,32 @@ expression: "format!(\"{buf:?}\")"
 Buffer {
     area: Rect { x: 0, y: 0, width: 50, height: 1 },
     content: [
-        "  1 background terminal running · /ps to view · /c",
+        "  1 个后台终端运行中 · /ps 查看 · /clean 关闭     ", // hidden by multi-width symbols: [(5, " "), (7, " "), (9, " "), (11, " "), (13, " "), (15, " "), (17, " "), (19, " "), (28, " "), (30, " "), (42, " "), (44, " ")]
     ],
     styles: [
         x: 0, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 5, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 6, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 7, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 8, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 9, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 10, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 11, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 12, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 13, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 14, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 15, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 16, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 17, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 18, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 19, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 20, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 28, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 29, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 30, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 31, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 42, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
+        x: 43, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: DIM,
+        x: 44, y: 0, fg: Reset, bg: Reset, underline: Reset, modifier: NONE,
     ]
 }
