@@ -1,0 +1,1515 @@
+diff --git a/README.md b/README.md
+index ae5073bea..4bb745a5f 100644
+--- a/README.md
++++ b/README.md
+@@ -54,6 +54,7 @@ You can also use Codex with an API key, but this requires [additional setup](htt
+ - [**Codex Documentation**](https://developers.openai.com/codex)
+ - [**Contributing**](./docs/contributing.md)
+ - [**Installing & building**](./docs/install.md)
++- [**Local patched build verification (macOS arm64)**](./docs/macos-arm64-local-patch-verification.md)
+ - [**Open source fund**](./docs/open-source-fund.md)
+ 
+ This repository is licensed under the [Apache-2.0 License](LICENSE).
+diff --git a/codex-rs/Cargo.lock b/codex-rs/Cargo.lock
+index e33b2f2a8..e82e15220 100644
+--- a/codex-rs/Cargo.lock
++++ b/codex-rs/Cargo.lock
+@@ -380,7 +380,7 @@ checksum = "5f0e0fee31ef5ed1ba1316088939cea399010ed7731dba877ed44aeb407a75ea"
+ 
+ [[package]]
+ name = "app_test_support"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "base64 0.22.1",
+@@ -1301,7 +1301,7 @@ checksum = "e9b18233253483ce2f65329a24072ec414db782531bdbb7d0bbc4bd2ce6b7e21"
+ 
+ [[package]]
+ name = "codex-ansi-escape"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "ansi-to-tui",
+  "ratatui",
+@@ -1310,7 +1310,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-api"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "assert_matches",
+@@ -1340,7 +1340,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-app-server"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "app_test_support",
+@@ -1388,7 +1388,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-app-server-protocol"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "clap",
+@@ -1411,7 +1411,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-app-server-test-client"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "clap",
+@@ -1424,7 +1424,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-apply-patch"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "assert_cmd",
+@@ -1440,7 +1440,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-arg0"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "codex-apply-patch",
+@@ -1453,7 +1453,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-async-utils"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "async-trait",
+  "pretty_assertions",
+@@ -1463,7 +1463,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-backend-client"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "codex-backend-openapi-models",
+@@ -1477,7 +1477,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-backend-openapi-models"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "serde",
+  "serde_json",
+@@ -1486,7 +1486,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-chatgpt"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "clap",
+@@ -1504,7 +1504,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-cli"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "assert_cmd",
+@@ -1545,7 +1545,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-client"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "async-trait",
+  "bytes",
+@@ -1568,7 +1568,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-cloud-requirements"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "async-trait",
+  "base64 0.22.1",
+@@ -1591,7 +1591,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-cloud-tasks"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "async-trait",
+@@ -1620,7 +1620,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-cloud-tasks-client"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "async-trait",
+@@ -1635,7 +1635,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-config"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "codex-app-server-protocol",
+@@ -1655,7 +1655,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-core"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "arc-swap",
+@@ -1761,7 +1761,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-debug-client"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "clap",
+@@ -1773,7 +1773,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-exec"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "assert_cmd",
+@@ -1810,7 +1810,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-exec-server"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "async-trait",
+@@ -1837,7 +1837,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-execpolicy"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "clap",
+@@ -1853,7 +1853,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-execpolicy-legacy"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "allocative",
+  "anyhow",
+@@ -1873,7 +1873,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-experimental-api-macros"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "proc-macro2",
+  "quote",
+@@ -1882,7 +1882,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-feedback"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "codex-protocol",
+@@ -1894,7 +1894,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-file-search"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "clap",
+@@ -1910,7 +1910,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-git"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "assert_matches",
+  "once_cell",
+@@ -1926,7 +1926,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-hooks"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "chrono",
+@@ -1941,7 +1941,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-keyring-store"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "keyring",
+  "tracing",
+@@ -1949,7 +1949,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-linux-sandbox"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "cc",
+  "clap",
+@@ -1967,7 +1967,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-lmstudio"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "codex-core",
+  "reqwest",
+@@ -1980,7 +1980,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-login"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "base64 0.22.1",
+@@ -2004,7 +2004,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-mcp-server"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "codex-arg0",
+@@ -2030,7 +2030,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-network-proxy"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "async-trait",
+@@ -2059,7 +2059,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-ollama"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "assert_matches",
+  "async-stream",
+@@ -2077,7 +2077,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-otel"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "chrono",
+  "codex-api",
+@@ -2107,7 +2107,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-process-hardening"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "libc",
+  "pretty_assertions",
+@@ -2115,7 +2115,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-protocol"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "codex-execpolicy",
+@@ -2142,7 +2142,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-responses-api-proxy"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "clap",
+@@ -2158,7 +2158,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-rmcp-client"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "axum",
+@@ -2189,7 +2189,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-secrets"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "age",
+  "anyhow",
+@@ -2208,7 +2208,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-shell-command"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "base64 0.22.1",
+@@ -2228,7 +2228,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-state"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "chrono",
+@@ -2250,7 +2250,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-stdio-to-uds"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "assert_cmd",
+@@ -2262,7 +2262,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-tui"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "arboard",
+@@ -2346,7 +2346,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-absolute-path"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "dirs",
+  "path-absolutize",
+@@ -2360,14 +2360,14 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-approval-presets"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "codex-core",
+ ]
+ 
+ [[package]]
+ name = "codex-utils-cache"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "lru 0.16.3",
+  "sha1",
+@@ -2376,7 +2376,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-cargo-bin"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "assert_cmd",
+  "runfiles",
+@@ -2385,7 +2385,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-cli"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "clap",
+  "codex-core",
+@@ -2397,15 +2397,15 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-elapsed"
+-version = "0.0.0"
++version = "9.9.99"
+ 
+ [[package]]
+ name = "codex-utils-fuzzy-match"
+-version = "0.0.0"
++version = "9.9.99"
+ 
+ [[package]]
+ name = "codex-utils-home-dir"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "dirs",
+  "pretty_assertions",
+@@ -2414,7 +2414,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-image"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "base64 0.22.1",
+  "codex-utils-cache",
+@@ -2426,7 +2426,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-json-to-toml"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "pretty_assertions",
+  "serde_json",
+@@ -2435,7 +2435,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-oss"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "codex-core",
+  "codex-lmstudio",
+@@ -2444,7 +2444,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-pty"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "filedescriptor",
+@@ -2460,7 +2460,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-readiness"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "assert_matches",
+  "async-trait",
+@@ -2471,14 +2471,14 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-rustls-provider"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "rustls",
+ ]
+ 
+ [[package]]
+ name = "codex-utils-sandbox-summary"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "codex-core",
+  "codex-utils-absolute-path",
+@@ -2487,14 +2487,14 @@ dependencies = [
+ 
+ [[package]]
+ name = "codex-utils-string"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "pretty_assertions",
+ ]
+ 
+ [[package]]
+ name = "codex-windows-sandbox"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "base64 0.22.1",
+@@ -2697,7 +2697,7 @@ checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
+ 
+ [[package]]
+ name = "core_test_support"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "assert_cmd",
+@@ -3570,7 +3570,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "exec_server_test_support"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "codex-core",
+@@ -5371,7 +5371,7 @@ checksum = "b3eede3bdf92f3b4f9dc04072a9ce5ab557d5ec9038773bf9ffcd5588b3cc05b"
+ 
+ [[package]]
+ name = "mcp_test_support"
+-version = "0.0.0"
++version = "9.9.99"
+ dependencies = [
+  "anyhow",
+  "codex-core",
+diff --git a/codex-rs/Cargo.toml b/codex-rs/Cargo.toml
+index a615cdac2..2a54ad0e8 100644
+--- a/codex-rs/Cargo.toml
++++ b/codex-rs/Cargo.toml
+@@ -64,7 +64,7 @@ members = [
+ resolver = "2"
+ 
+ [workspace.package]
+-version = "0.0.0"
++version = "9.9.99"
+ # Track the edition for all workspace crates in one place. Individual
+ # crates can still override this value, but keeping it here means new
+ # crates created with `cargo new -w ...` automatically inherit the 2024
+diff --git a/codex-rs/core/src/mcp_connection_manager.rs b/codex-rs/core/src/mcp_connection_manager.rs
+index 6f6bfad6e..7e66aeb43 100644
+--- a/codex-rs/core/src/mcp_connection_manager.rs
++++ b/codex-rs/core/src/mcp_connection_manager.rs
+@@ -85,6 +85,7 @@ pub const DEFAULT_STARTUP_TIMEOUT: Duration = Duration::from_secs(10);
+ 
+ /// Default timeout for individual tool calls.
+ const DEFAULT_TOOL_TIMEOUT: Duration = Duration::from_secs(60);
++const STARTUP_FAILURE_RECONNECT_COOLDOWN: Duration = Duration::from_secs(10);
+ 
+ const CODEX_APPS_TOOLS_CACHE_TTL: Duration = Duration::from_secs(3600);
+ 
+@@ -264,11 +265,29 @@ impl ManagedClient {
+ 
+ #[derive(Clone)]
+ struct AsyncManagedClient {
+-    client: Shared<BoxFuture<'static, Result<ManagedClient, StartupOutcomeError>>>,
++    builder: ManagedClientBuilder,
++    client: Arc<Mutex<ManagedClientFuture>>,
++    reconnect_lock: Arc<Mutex<()>>,
++    next_startup_reconnect_attempt: Arc<Mutex<Option<Instant>>>,
+ }
+ 
+-impl AsyncManagedClient {
+-    fn new(
++type ManagedClientFuture = Shared<BoxFuture<'static, Result<ManagedClient, StartupOutcomeError>>>;
++
++#[derive(Clone)]
++struct ManagedClientBuilder {
++    server_name: String,
++    transport: McpServerTransportConfig,
++    store_mode: OAuthCredentialsStoreMode,
++    startup_timeout: Option<Duration>,
++    tool_timeout: Duration,
++    tool_filter: ToolFilter,
++    cancel_token: CancellationToken,
++    tx_event: Sender<Event>,
++    elicitation_requests: ElicitationRequestManager,
++}
++
++impl ManagedClientBuilder {
++    fn from_config(
+         server_name: String,
+         config: McpServerConfig,
+         store_mode: OAuthCredentialsStoreMode,
+@@ -277,18 +296,40 @@ impl AsyncManagedClient {
+         elicitation_requests: ElicitationRequestManager,
+     ) -> Self {
+         let tool_filter = ToolFilter::from_config(&config);
+-        let fut = async move {
++        Self {
++            server_name,
++            transport: config.transport,
++            store_mode,
++            startup_timeout: config.startup_timeout_sec.or(Some(DEFAULT_STARTUP_TIMEOUT)),
++            tool_timeout: config.tool_timeout_sec.unwrap_or(DEFAULT_TOOL_TIMEOUT),
++            tool_filter,
++            cancel_token,
++            tx_event,
++            elicitation_requests,
++        }
++    }
++
++    fn connect(&self) -> ManagedClientFuture {
++        let server_name = self.server_name.clone();
++        let transport = self.transport.clone();
++        let store_mode = self.store_mode;
++        let startup_timeout = self.startup_timeout;
++        let tool_timeout = self.tool_timeout;
++        let tool_filter = self.tool_filter.clone();
++        let cancel_token = self.cancel_token.clone();
++        let tx_event = self.tx_event.clone();
++        let elicitation_requests = self.elicitation_requests.clone();
++        async move {
+             if let Err(error) = validate_mcp_server_name(&server_name) {
+                 return Err(error.into());
+             }
+ 
+-            let client =
+-                Arc::new(make_rmcp_client(&server_name, config.transport, store_mode).await?);
++            let client = Arc::new(make_rmcp_client(&server_name, transport, store_mode).await?);
+             match start_server_task(
+                 server_name,
+                 client,
+-                config.startup_timeout_sec.or(Some(DEFAULT_STARTUP_TIMEOUT)),
+-                config.tool_timeout_sec.unwrap_or(DEFAULT_TOOL_TIMEOUT),
++                startup_timeout,
++                tool_timeout,
+                 tool_filter,
+                 tx_event,
+                 elicitation_requests,
+@@ -299,18 +340,108 @@ impl AsyncManagedClient {
+                 Ok(result) => result,
+                 Err(CancelErr::Cancelled) => Err(StartupOutcomeError::Cancelled),
+             }
+-        };
++        }
++        .boxed()
++        .shared()
++    }
++}
++
++impl AsyncManagedClient {
++    fn new(
++        server_name: String,
++        config: McpServerConfig,
++        store_mode: OAuthCredentialsStoreMode,
++        cancel_token: CancellationToken,
++        tx_event: Sender<Event>,
++        elicitation_requests: ElicitationRequestManager,
++    ) -> Self {
++        let builder = ManagedClientBuilder::from_config(
++            server_name,
++            config,
++            store_mode,
++            cancel_token,
++            tx_event,
++            elicitation_requests,
++        );
+         Self {
+-            client: fut.boxed().shared(),
++            client: Arc::new(Mutex::new(builder.connect())),
++            builder,
++            reconnect_lock: Arc::new(Mutex::new(())),
++            next_startup_reconnect_attempt: Arc::new(Mutex::new(None)),
+         }
+     }
+ 
++    async fn client_future(&self) -> ManagedClientFuture {
++        self.client.lock().await.clone()
++    }
++
+     async fn client(&self) -> Result<ManagedClient, StartupOutcomeError> {
+-        self.client.clone().await
++        self.client_future().await.await
++    }
++
++    async fn reconnect(
++        &self,
++        previous_client: Option<&Arc<RmcpClient>>,
++    ) -> Result<ManagedClient, StartupOutcomeError> {
++        let _reconnect_guard = self.reconnect_lock.lock().await;
++        let current_future = self.client_future().await;
++        match current_future.clone().now_or_never() {
++            None => return current_future.await,
++            Some(Ok(current_managed_client)) => {
++                if let Some(previous_client) = previous_client {
++                    if !Arc::ptr_eq(&current_managed_client.client, previous_client) {
++                        return Ok(current_managed_client);
++                    }
++                } else {
++                    return Ok(current_managed_client);
++                }
++            }
++            Some(Err(StartupOutcomeError::Cancelled)) => {
++                return Err(StartupOutcomeError::Cancelled);
++            }
++            Some(Err(StartupOutcomeError::Failed { .. })) => {}
++        }
++
++        let future = self.builder.connect();
++        {
++            let mut guard = self.client.lock().await;
++            *guard = future.clone();
++        }
++        future.await
++    }
++
++    async fn should_retry_startup_failure(&self, error: &str) -> bool {
++        if !is_connection_error_message(error) {
++            return false;
++        }
++
++        let mut next_attempt_guard = self.next_startup_reconnect_attempt.lock().await;
++        let now = Instant::now();
++        if let Some(next_attempt) = *next_attempt_guard
++            && now < next_attempt
++        {
++            return false;
++        }
++
++        *next_attempt_guard = Some(now + STARTUP_FAILURE_RECONNECT_COOLDOWN);
++        true
++    }
++
++    async fn client_or_reconnect(&self) -> Result<ManagedClient, StartupOutcomeError> {
++        match self.client().await {
++            Ok(client) => Ok(client),
++            Err(StartupOutcomeError::Cancelled) => Err(StartupOutcomeError::Cancelled),
++            Err(StartupOutcomeError::Failed { error }) => {
++                if !self.should_retry_startup_failure(&error).await {
++                    return Err(StartupOutcomeError::Failed { error });
++                }
++                self.reconnect(None).await
++            }
++        }
+     }
+ 
+     async fn notify_sandbox_state_change(&self, sandbox_state: &SandboxState) -> Result<()> {
+-        let managed = self.client().await?;
++        let managed = self.client_or_reconnect().await?;
+         managed.notify_sandbox_state_change(sandbox_state).await
+     }
+ }
+@@ -336,6 +467,7 @@ pub struct SandboxState {
+ pub(crate) struct McpConnectionManager {
+     clients: HashMap<String, AsyncManagedClient>,
+     elicitation_requests: ElicitationRequestManager,
++    sandbox_state: Arc<Mutex<Option<SandboxState>>>,
+ }
+ 
+ impl McpConnectionManager {
+@@ -351,6 +483,10 @@ impl McpConnectionManager {
+         if cancel_token.is_cancelled() {
+             return;
+         }
++        {
++            let mut sandbox_state_guard = self.sandbox_state.lock().await;
++            *sandbox_state_guard = Some(initial_sandbox_state.clone());
++        }
+         let mut clients = HashMap::new();
+         let mut join_set = JoinSet::new();
+         let elicitation_requests = ElicitationRequestManager::default();
+@@ -443,13 +579,46 @@ impl McpConnectionManager {
+         });
+     }
+ 
+-    async fn client_by_name(&self, name: &str) -> Result<ManagedClient> {
++    fn async_client_by_name(&self, name: &str) -> Result<&AsyncManagedClient> {
+         self.clients
+             .get(name)
+-            .ok_or_else(|| anyhow!("unknown MCP server '{name}'"))?
+-            .client()
++            .ok_or_else(|| anyhow!("unknown MCP server '{name}'"))
++    }
++
++    async fn reconnect_client(
++        &self,
++        server_name: &str,
++        previous_client: Option<&Arc<RmcpClient>>,
++    ) -> Result<ManagedClient> {
++        let async_client = self.async_client_by_name(server_name)?;
++        let managed = async_client
++            .reconnect(previous_client)
+             .await
+-            .context("failed to get client")
++            .with_context(|| format!("failed to reconnect MCP server `{server_name}`"))?;
++
++        if let Some(sandbox_state) = self.sandbox_state.lock().await.clone()
++            && let Err(error) = managed.notify_sandbox_state_change(&sandbox_state).await
++        {
++            warn!(
++                "Failed to notify sandbox state to reconnected MCP server {server_name}: {error:#}",
++            );
++        }
++
++        Ok(managed)
++    }
++
++    async fn client_by_name(&self, name: &str) -> Result<ManagedClient> {
++        let async_client = self.async_client_by_name(name)?;
++        match async_client.client().await {
++            Ok(client) => Ok(client),
++            Err(StartupOutcomeError::Cancelled) => Err(anyhow!("MCP startup cancelled")),
++            Err(StartupOutcomeError::Failed { error }) => {
++                if !is_connection_error_message(&error) {
++                    return Err(anyhow!("{error}"));
++                }
++                self.reconnect_client(name, None).await
++            }
++        }
+     }
+ 
+     pub async fn resolve_elicitation(
+@@ -505,7 +674,7 @@ impl McpConnectionManager {
+     pub async fn list_all_tools(&self) -> HashMap<String, ToolInfo> {
+         let mut tools = HashMap::new();
+         for (server_name, managed_client) in &self.clients {
+-            let client = managed_client.client().await.ok();
++            let client = managed_client.client_or_reconnect().await.ok();
+             if let Some(client) = client {
+                 let rmcp_client = client.client;
+                 let tool_timeout = client.tool_timeout;
+@@ -567,7 +736,7 @@ impl McpConnectionManager {
+ 
+         for (server_name, async_managed_client) in clients_snapshot {
+             let server_name = server_name.clone();
+-            let Ok(managed_client) = async_managed_client.client().await else {
++            let Ok(managed_client) = async_managed_client.client_or_reconnect().await else {
+                 continue;
+             };
+             let timeout = managed_client.tool_timeout;
+@@ -633,7 +802,7 @@ impl McpConnectionManager {
+ 
+         for (server_name, async_managed_client) in clients_snapshot {
+             let server_name_cloned = server_name.clone();
+-            let Ok(managed_client) = async_managed_client.client().await else {
++            let Ok(managed_client) = async_managed_client.client_or_reconnect().await else {
+                 continue;
+             };
+             let client = managed_client.client.clone();
+@@ -701,18 +870,33 @@ impl McpConnectionManager {
+         tool: &str,
+         arguments: Option<serde_json::Value>,
+     ) -> Result<CallToolResult> {
+-        let client = self.client_by_name(server).await?;
+-        if !client.tool_filter.allows(tool) {
+-            return Err(anyhow!(
+-                "tool '{tool}' is disabled for MCP server '{server}'"
+-            ));
+-        }
++        let managed_client = self.client_by_name(server).await?;
++        let tool_name = tool.to_string();
++
++        let call_result = match call_tool_with_managed_client(
++            &managed_client,
++            server,
++            &tool_name,
++            arguments.clone(),
++        )
++        .await
++        {
++            Ok(result) => Ok(result),
++            Err(error) if is_connection_error(&error) => {
++                warn!(
++                    "MCP tool call for `{server}/{tool}` failed due to connection error; reconnecting and retrying: {error:#}",
++                );
++                let reconnected_client = self
++                    .reconnect_client(server, Some(&managed_client.client))
++                    .await?;
++                call_tool_with_managed_client(&reconnected_client, server, &tool_name, arguments)
++                    .await
++            }
++            Err(error) => Err(error),
++        };
+ 
+-        let result: rmcp::model::CallToolResult = client
+-            .client
+-            .call_tool(tool.to_string(), arguments, client.tool_timeout)
+-            .await
+-            .with_context(|| format!("tool call failed for `{server}/{tool}`"))?;
++        let result: rmcp::model::CallToolResult =
++            call_result.with_context(|| format!("tool call failed for `{server}/{tool}`"))?;
+ 
+         let content = result
+             .content
+@@ -740,11 +924,23 @@ impl McpConnectionManager {
+         let managed = self.client_by_name(server).await?;
+         let timeout = managed.tool_timeout;
+ 
+-        managed
+-            .client
+-            .list_resources(params, timeout)
+-            .await
+-            .with_context(|| format!("resources/list failed for `{server}`"))
++        let list_result = match managed.client.list_resources(params.clone(), timeout).await {
++            Ok(result) => Ok(result),
++            Err(error) if is_connection_error(&error) => {
++                warn!(
++                    "MCP resources/list for `{server}` failed due to connection error; reconnecting and retrying: {error:#}",
++                );
++                let reconnected_client =
++                    self.reconnect_client(server, Some(&managed.client)).await?;
++                reconnected_client
++                    .client
++                    .list_resources(params, reconnected_client.tool_timeout)
++                    .await
++            }
++            Err(error) => Err(error),
++        };
++
++        list_result.with_context(|| format!("resources/list failed for `{server}`"))
+     }
+ 
+     /// List resource templates from the specified server.
+@@ -757,10 +953,26 @@ impl McpConnectionManager {
+         let client = managed.client.clone();
+         let timeout = managed.tool_timeout;
+ 
+-        client
+-            .list_resource_templates(params, timeout)
++        let list_result = match client
++            .list_resource_templates(params.clone(), timeout)
+             .await
+-            .with_context(|| format!("resources/templates/list failed for `{server}`"))
++        {
++            Ok(result) => Ok(result),
++            Err(error) if is_connection_error(&error) => {
++                warn!(
++                    "MCP resources/templates/list for `{server}` failed due to connection error; reconnecting and retrying: {error:#}",
++                );
++                let reconnected_client =
++                    self.reconnect_client(server, Some(&managed.client)).await?;
++                reconnected_client
++                    .client
++                    .list_resource_templates(params, reconnected_client.tool_timeout)
++                    .await
++            }
++            Err(error) => Err(error),
++        };
++
++        list_result.with_context(|| format!("resources/templates/list failed for `{server}`"))
+     }
+ 
+     /// Read a resource from the specified server.
+@@ -770,14 +982,29 @@ impl McpConnectionManager {
+         params: ReadResourceRequestParams,
+     ) -> Result<ReadResourceResult> {
+         let managed = self.client_by_name(server).await?;
+-        let client = managed.client.clone();
+-        let timeout = managed.tool_timeout;
+         let uri = params.uri.clone();
+ 
+-        client
+-            .read_resource(params, timeout)
++        let read_result = match managed
++            .client
++            .read_resource(params.clone(), managed.tool_timeout)
+             .await
+-            .with_context(|| format!("resources/read failed for `{server}` ({uri})"))
++        {
++            Ok(result) => Ok(result),
++            Err(error) if is_connection_error(&error) => {
++                warn!(
++                    "MCP resources/read for `{server}` failed due to connection error; reconnecting and retrying: {error:#}",
++                );
++                let reconnected_client =
++                    self.reconnect_client(server, Some(&managed.client)).await?;
++                reconnected_client
++                    .client
++                    .read_resource(params, reconnected_client.tool_timeout)
++                    .await
++            }
++            Err(error) => Err(error),
++        };
++
++        read_result.with_context(|| format!("resources/read failed for `{server}` ({uri})"))
+     }
+ 
+     pub async fn parse_tool_name(&self, tool_name: &str) -> Option<(String, String)> {
+@@ -788,6 +1015,11 @@ impl McpConnectionManager {
+     }
+ 
+     pub async fn notify_sandbox_state_change(&self, sandbox_state: &SandboxState) -> Result<()> {
++        {
++            let mut sandbox_state_guard = self.sandbox_state.lock().await;
++            *sandbox_state_guard = Some(sandbox_state.clone());
++        }
++
+         let mut join_set = JoinSet::new();
+ 
+         for async_managed_client in self.clients.values() {
+@@ -816,6 +1048,54 @@ impl McpConnectionManager {
+     }
+ }
+ 
++async fn call_tool_with_managed_client(
++    managed_client: &ManagedClient,
++    server: &str,
++    tool: &str,
++    arguments: Option<serde_json::Value>,
++) -> Result<rmcp::model::CallToolResult> {
++    if !managed_client.tool_filter.allows(tool) {
++        return Err(anyhow!(
++            "tool '{tool}' is disabled for MCP server '{server}'"
++        ));
++    }
++
++    managed_client
++        .client
++        .call_tool(tool.to_string(), arguments, managed_client.tool_timeout)
++        .await
++}
++
++fn is_connection_error(error: &anyhow::Error) -> bool {
++    error.chain().any(|cause| {
++        if cause.downcast_ref::<std::io::Error>().is_some() {
++            return true;
++        }
++
++        is_connection_error_message(&cause.to_string())
++    })
++}
++
++fn is_connection_error_message(message: &str) -> bool {
++    const CONNECTION_ERROR_HINTS: [&str; 10] = [
++        "broken pipe",
++        "connection reset",
++        "connection closed",
++        "connection aborted",
++        "unexpected eof",
++        "transport closed",
++        "channel closed",
++        "client not initialized",
++        "not connected",
++        "timed out handshaking with mcp server",
++    ];
++
++    let normalized = message.to_ascii_lowercase();
++    CONNECTION_ERROR_HINTS
++        .iter()
++        .any(|hint| normalized.contains(hint))
++}
++
+ async fn emit_update(
+     tx_event: &Sender<Event>,
+     update: McpStartupUpdateEvent,
+@@ -1497,4 +1777,34 @@ mod tests {
+             display
+         );
+     }
++
++    #[test]
++    fn is_connection_error_detects_io_errors() {
++        let error = anyhow::Error::new(std::io::Error::new(
++            std::io::ErrorKind::BrokenPipe,
++            "pipe closed",
++        ));
++
++        assert!(is_connection_error(&error));
++    }
++
++    #[test]
++    fn is_connection_error_ignores_application_errors() {
++        let error = anyhow::anyhow!("unknown tool: echo");
++
++        assert!(!is_connection_error(&error));
++    }
++
++    #[test]
++    fn is_connection_error_message_detects_transport_hints() {
++        assert!(is_connection_error_message(
++            "timed out handshaking with MCP server after 10s"
++        ));
++        assert!(is_connection_error_message("connection reset by peer"));
++    }
++
++    #[test]
++    fn is_connection_error_message_ignores_auth_errors() {
++        assert!(!is_connection_error_message("Auth required for server"));
++    }
+ }
+diff --git a/codex-rs/core/tests/suite/rmcp_client.rs b/codex-rs/core/tests/suite/rmcp_client.rs
+index a1bf72b10..512753b18 100644
+--- a/codex-rs/core/tests/suite/rmcp_client.rs
++++ b/codex-rs/core/tests/suite/rmcp_client.rs
+@@ -189,6 +189,220 @@ async fn stdio_server_round_trip() -> anyhow::Result<()> {
+     Ok(())
+ }
+ 
++#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
++#[serial(mcp_test_value)]
++async fn stdio_server_reconnects_after_disconnect() -> anyhow::Result<()> {
++    skip_if_no_network!(Ok(()));
++
++    let server = responses::start_mock_server().await;
++
++    let server_name = "rmcp_reconnect";
++    let tool_name = format!("mcp__{server_name}__echo");
++    let call_ids = ["call-reconnect-1", "call-reconnect-2"];
++
++    mount_sse_once(
++        &server,
++        responses::sse(vec![
++            responses::ev_response_created("resp-reconnect-1"),
++            responses::ev_function_call(call_ids[0], &tool_name, "{\"message\":\"ping-1\"}"),
++            responses::ev_completed("resp-reconnect-1"),
++        ]),
++    )
++    .await;
++    mount_sse_once(
++        &server,
++        responses::sse(vec![
++            responses::ev_assistant_message("msg-reconnect-1", "first rmcp call completed."),
++            responses::ev_completed("resp-reconnect-2"),
++        ]),
++    )
++    .await;
++    mount_sse_once(
++        &server,
++        responses::sse(vec![
++            responses::ev_response_created("resp-reconnect-3"),
++            responses::ev_function_call(call_ids[1], &tool_name, "{\"message\":\"ping-2\"}"),
++            responses::ev_completed("resp-reconnect-3"),
++        ]),
++    )
++    .await;
++    mount_sse_once(
++        &server,
++        responses::sse(vec![
++            responses::ev_assistant_message("msg-reconnect-2", "second rmcp call completed."),
++            responses::ev_completed("resp-reconnect-4"),
++        ]),
++    )
++    .await;
++
++    let expected_env_value = "propagated-env-reconnect";
++    let rmcp_test_server_bin = stdio_server_bin()?;
++
++    let fixture = test_codex()
++        .with_config(move |config| {
++            let mut servers = config.mcp_servers.get().clone();
++            servers.insert(
++                server_name.to_string(),
++                McpServerConfig {
++                    transport: McpServerTransportConfig::Stdio {
++                        command: rmcp_test_server_bin,
++                        args: Vec::new(),
++                        env: Some(HashMap::from([
++                            ("MCP_TEST_VALUE".to_string(), expected_env_value.to_string()),
++                            ("MCP_EXIT_AFTER_CALLS".to_string(), "1".to_string()),
++                        ])),
++                        env_vars: Vec::new(),
++                        cwd: None,
++                    },
++                    enabled: true,
++                    required: false,
++                    disabled_reason: None,
++                    startup_timeout_sec: Some(Duration::from_secs(10)),
++                    tool_timeout_sec: None,
++                    enabled_tools: None,
++                    disabled_tools: None,
++                    scopes: None,
++                },
++            );
++            config
++                .mcp_servers
++                .set(servers)
++                .expect("test mcp servers should accept any configuration");
++        })
++        .build(&server)
++        .await?;
++    let session_model = fixture.session_configured.model.clone();
++
++    fixture
++        .codex
++        .submit(Op::UserTurn {
++            items: vec![UserInput::Text {
++                text: "call the reconnect test rmcp tool".into(),
++                text_elements: Vec::new(),
++            }],
++            final_output_json_schema: None,
++            cwd: fixture.cwd.path().to_path_buf(),
++            approval_policy: AskForApproval::Never,
++            sandbox_policy: SandboxPolicy::ReadOnly,
++            model: session_model.clone(),
++            effort: None,
++            summary: ReasoningSummary::Auto,
++            collaboration_mode: None,
++            personality: None,
++        })
++        .await?;
++
++    let begin_event = wait_for_event(&fixture.codex, |ev| {
++        matches!(ev, EventMsg::McpToolCallBegin(_))
++    })
++    .await;
++    let EventMsg::McpToolCallBegin(begin) = begin_event else {
++        unreachable!("event guard guarantees McpToolCallBegin");
++    };
++    assert_eq!(begin.invocation.server, server_name);
++    assert_eq!(begin.invocation.tool, "echo");
++
++    let end_event = wait_for_event(&fixture.codex, |ev| {
++        matches!(ev, EventMsg::McpToolCallEnd(_))
++    })
++    .await;
++    let EventMsg::McpToolCallEnd(end) = end_event else {
++        unreachable!("event guard guarantees McpToolCallEnd");
++    };
++    let result = end
++        .result
++        .as_ref()
++        .expect("first rmcp echo tool call should succeed");
++    assert_eq!(result.is_error, Some(false));
++    let structured = result
++        .structured_content
++        .as_ref()
++        .expect("structured content");
++    let Value::Object(first_map) = structured else {
++        panic!("structured content should be an object: {structured:?}");
++    };
++    let first_echo = first_map
++        .get("echo")
++        .and_then(Value::as_str)
++        .expect("echo payload present");
++    assert_eq!(first_echo, "ECHOING: ping-1");
++    let first_env = first_map
++        .get("env")
++        .and_then(Value::as_str)
++        .expect("env snapshot inserted");
++    assert_eq!(first_env, expected_env_value);
++
++    wait_for_event(&fixture.codex, |ev| matches!(ev, EventMsg::TurnComplete(_))).await;
++    // The test server exits on a background task after the first successful call.
++    // Give it enough headroom on slower CI runners before issuing the next turn.
++    sleep(Duration::from_millis(300)).await;
++
++    fixture
++        .codex
++        .submit(Op::UserTurn {
++            items: vec![UserInput::Text {
++                text: "call the reconnect test rmcp tool again".into(),
++                text_elements: Vec::new(),
++            }],
++            final_output_json_schema: None,
++            cwd: fixture.cwd.path().to_path_buf(),
++            approval_policy: AskForApproval::Never,
++            sandbox_policy: SandboxPolicy::ReadOnly,
++            model: session_model,
++            effort: None,
++            summary: ReasoningSummary::Auto,
++            collaboration_mode: None,
++            personality: None,
++        })
++        .await?;
++
++    let begin_event = wait_for_event(&fixture.codex, |ev| {
++        matches!(ev, EventMsg::McpToolCallBegin(_))
++    })
++    .await;
++    let EventMsg::McpToolCallBegin(begin) = begin_event else {
++        unreachable!("event guard guarantees McpToolCallBegin");
++    };
++    assert_eq!(begin.invocation.server, server_name);
++    assert_eq!(begin.invocation.tool, "echo");
++
++    let end_event = wait_for_event(&fixture.codex, |ev| {
++        matches!(ev, EventMsg::McpToolCallEnd(_))
++    })
++    .await;
++    let EventMsg::McpToolCallEnd(end) = end_event else {
++        unreachable!("event guard guarantees McpToolCallEnd");
++    };
++    let result = end
++        .result
++        .as_ref()
++        .expect("second rmcp echo tool call should succeed after reconnect");
++    assert_eq!(result.is_error, Some(false));
++    let structured = result
++        .structured_content
++        .as_ref()
++        .expect("structured content");
++    let Value::Object(second_map) = structured else {
++        panic!("structured content should be an object: {structured:?}");
++    };
++    let second_echo = second_map
++        .get("echo")
++        .and_then(Value::as_str)
++        .expect("echo payload present");
++    assert_eq!(second_echo, "ECHOING: ping-2");
++    let second_env = second_map
++        .get("env")
++        .and_then(Value::as_str)
++        .expect("env snapshot inserted");
++    assert_eq!(second_env, expected_env_value);
++
++    wait_for_event(&fixture.codex, |ev| matches!(ev, EventMsg::TurnComplete(_))).await;
++
++    server.verify().await;
++
++    Ok(())
++}
++
+ #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+ #[serial(mcp_test_value)]
+ async fn stdio_image_responses_round_trip() -> anyhow::Result<()> {
+diff --git a/codex-rs/rmcp-client/src/bin/test_stdio_server.rs b/codex-rs/rmcp-client/src/bin/test_stdio_server.rs
+index d7708bf5e..da2eb3670 100644
+--- a/codex-rs/rmcp-client/src/bin/test_stdio_server.rs
++++ b/codex-rs/rmcp-client/src/bin/test_stdio_server.rs
+@@ -1,6 +1,7 @@
+ use std::borrow::Cow;
+ use std::collections::HashMap;
+ use std::sync::Arc;
++use std::time::Duration;
+ 
+ use rmcp::ErrorData as McpError;
+ use rmcp::ServiceExt;
+@@ -31,6 +32,7 @@ struct TestToolServer {
+     tools: Arc<Vec<Tool>>,
+     resources: Arc<Vec<Resource>>,
+     resource_templates: Arc<Vec<ResourceTemplate>>,
++    exit_after_calls: Option<Arc<tokio::sync::Mutex<usize>>>,
+ }
+ 
+ const MEMO_URI: &str = "memo://codex/example-note";
+@@ -50,10 +52,23 @@ impl TestToolServer {
+         ];
+         let resources = vec![Self::memo_resource()];
+         let resource_templates = vec![Self::memo_template()];
++        let exit_after_calls = std::env::var("MCP_EXIT_AFTER_CALLS")
++            .ok()
++            .and_then(|value| {
++                value
++                    .parse::<usize>()
++                    .inspect_err(|error| {
++                        eprintln!("invalid MCP_EXIT_AFTER_CALLS value `{value}`: {error}");
++                    })
++                    .ok()
++            })
++            .filter(|value| *value > 0)
++            .map(|value| Arc::new(tokio::sync::Mutex::new(value)));
+         Self {
+             tools: Arc::new(tools),
+             resources: Arc::new(resources),
+             resource_templates: Arc::new(resource_templates),
++            exit_after_calls,
+         }
+     }
+ 
+@@ -295,7 +310,7 @@ impl ServerHandler for TestToolServer {
+         request: CallToolRequestParams,
+         _context: rmcp::service::RequestContext<rmcp::service::RoleServer>,
+     ) -> Result<CallToolResult, McpError> {
+-        match request.name.as_ref() {
++        let result = match request.name.as_ref() {
+             "echo" => {
+                 let args: EchoArgs = match request.arguments {
+                     Some(arguments) => serde_json::from_value(serde_json::Value::Object(
+@@ -352,7 +367,13 @@ impl ServerHandler for TestToolServer {
+                 format!("unknown tool: {other}"),
+                 None,
+             )),
++        };
++
++        if result.is_ok() {
++            self.schedule_exit_after_call_if_needed().await;
+         }
++
++        result
+     }
+ }
+ 
+@@ -430,6 +451,29 @@ impl TestToolServer {
+ 
+         Ok(CallToolResult::success(content))
+     }
++
++    async fn schedule_exit_after_call_if_needed(&self) {
++        let Some(remaining_calls) = &self.exit_after_calls else {
++            return;
++        };
++
++        let should_exit = {
++            let mut remaining = remaining_calls.lock().await;
++            if *remaining == 0 {
++                false
++            } else {
++                *remaining -= 1;
++                *remaining == 0
++            }
++        };
++
++        if should_exit {
++            tokio::spawn(async move {
++                tokio::time::sleep(Duration::from_millis(25)).await;
++                std::process::exit(0);
++            });
++        }
++    }
+ }
+ 
+ fn parse_data_url(url: &str) -> Option<(String, String)> {
+diff --git a/docs/macos-arm64-local-patch-verification.md b/docs/macos-arm64-local-patch-verification.md
+new file mode 100644
+index 000000000..24849dabf
+--- /dev/null
++++ b/docs/macos-arm64-local-patch-verification.md
+@@ -0,0 +1,33 @@
++# macOS arm64 patched Codex binary verification
++
++This document records the verified local binary used for MCP auto-reconnect testing on macOS arm64.
++
++## Binary path
++
++`/opt/homebrew/lib/node_modules/@openai/codex/vendor/aarch64-apple-darwin/codex/codex`
++
++## Verified result
++
++- Verification date: 2026-02-12
++- `codex --version`: `codex-cli 9.9.99`
++- SHA-256:
++  `f470c425026e10e7103dd3b60dde3fef9b1a6aaf677100327732a6261a8c4e6d`
++
++## Re-check commands
++
++```bash
++/opt/homebrew/lib/node_modules/@openai/codex/vendor/aarch64-apple-darwin/codex/codex --version
++shasum -a 256 /opt/homebrew/lib/node_modules/@openai/codex/vendor/aarch64-apple-darwin/codex/codex
++```
++
++Expected output:
++
++```text
++codex-cli 9.9.99
++f470c425026e10e7103dd3b60dde3fef9b1a6aaf677100327732a6261a8c4e6d  /opt/homebrew/lib/node_modules/@openai/codex/vendor/aarch64-apple-darwin/codex/codex
++```
++
++## Notes
++
++- This is a fork-maintained build intended to include local MCP reconnect improvements.
++- If either version or hash changes, update this document and re-run MCP reconnect verification.

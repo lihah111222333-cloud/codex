@@ -1,0 +1,24 @@
+From 4175c5790b84f15cbe028d884154dbb542b0ab81 Mon Sep 17 00:00:00 2001
+From: hai <mima0000@DMMAC.local>
+Date: Thu, 12 Feb 2026 04:56:24 +0800
+Subject: [PATCH 2/5] test(core): set required=false in reconnect MCP fixture
+
+---
+ codex-rs/core/tests/suite/rmcp_client.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/codex-rs/core/tests/suite/rmcp_client.rs b/codex-rs/core/tests/suite/rmcp_client.rs
+index 98f3145b9..95ea91649 100644
+--- a/codex-rs/core/tests/suite/rmcp_client.rs
++++ b/codex-rs/core/tests/suite/rmcp_client.rs
+@@ -255,6 +255,7 @@ async fn stdio_server_reconnects_after_disconnect() -> anyhow::Result<()> {
+                         cwd: None,
+                     },
+                     enabled: true,
++                    required: false,
+                     disabled_reason: None,
+                     startup_timeout_sec: Some(Duration::from_secs(10)),
+                     tool_timeout_sec: None,
+-- 
+2.39.2 (Apple Git-143)
+

@@ -1,0 +1,65 @@
+From e1ee08cdd55af3aabe088fb769e2355d4c1d3265 Mon Sep 17 00:00:00 2001
+From: hai <mima0000@DMMAC.local>
+Date: Thu, 12 Feb 2026 17:21:46 +0800
+Subject: [PATCH 5/5] docs: add macOS arm64 patched binary verification
+
+---
+ README.md                                    |  1 +
+ docs/macos-arm64-local-patch-verification.md | 33 ++++++++++++++++++++
+ 2 files changed, 34 insertions(+)
+ create mode 100644 docs/macos-arm64-local-patch-verification.md
+
+diff --git a/README.md b/README.md
+index ae5073bea..4bb745a5f 100644
+--- a/README.md
++++ b/README.md
+@@ -54,6 +54,7 @@ You can also use Codex with an API key, but this requires [additional setup](htt
+ - [**Codex Documentation**](https://developers.openai.com/codex)
+ - [**Contributing**](./docs/contributing.md)
+ - [**Installing & building**](./docs/install.md)
++- [**Local patched build verification (macOS arm64)**](./docs/macos-arm64-local-patch-verification.md)
+ - [**Open source fund**](./docs/open-source-fund.md)
+ 
+ This repository is licensed under the [Apache-2.0 License](LICENSE).
+diff --git a/docs/macos-arm64-local-patch-verification.md b/docs/macos-arm64-local-patch-verification.md
+new file mode 100644
+index 000000000..24849dabf
+--- /dev/null
++++ b/docs/macos-arm64-local-patch-verification.md
+@@ -0,0 +1,33 @@
++# macOS arm64 patched Codex binary verification
++
++This document records the verified local binary used for MCP auto-reconnect testing on macOS arm64.
++
++## Binary path
++
++`/opt/homebrew/lib/node_modules/@openai/codex/vendor/aarch64-apple-darwin/codex/codex`
++
++## Verified result
++
++- Verification date: 2026-02-12
++- `codex --version`: `codex-cli 9.9.99`
++- SHA-256:
++  `f470c425026e10e7103dd3b60dde3fef9b1a6aaf677100327732a6261a8c4e6d`
++
++## Re-check commands
++
++```bash
++/opt/homebrew/lib/node_modules/@openai/codex/vendor/aarch64-apple-darwin/codex/codex --version
++shasum -a 256 /opt/homebrew/lib/node_modules/@openai/codex/vendor/aarch64-apple-darwin/codex/codex
++```
++
++Expected output:
++
++```text
++codex-cli 9.9.99
++f470c425026e10e7103dd3b60dde3fef9b1a6aaf677100327732a6261a8c4e6d  /opt/homebrew/lib/node_modules/@openai/codex/vendor/aarch64-apple-darwin/codex/codex
++```
++
++## Notes
++
++- This is a fork-maintained build intended to include local MCP reconnect improvements.
++- If either version or hash changes, update this document and re-run MCP reconnect verification.
+-- 
+2.39.2 (Apple Git-143)
+
