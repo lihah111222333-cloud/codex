@@ -1,0 +1,16 @@
+{
+  "output_file": "/Users/mima0000/Desktop/wj/codex/dictionaries/meta/combined_zh_en_dictionary.jsonl",
+  "total_records": 308286,
+  "records_by_source": {
+    "cc-cedict": 200068,
+    "cldr-locale-display": 1239,
+    "microsoft-terminology": 106979
+  },
+  "sources_attempted": [
+    "cc-cedict",
+    "microsoft-terminology (zh-Hans/zh-Hant)",
+    "cldr-locale-display (en -> zh-Hans)",
+    "iate (downloaded source page only; no machine-export merged)",
+    "unterm (downloaded source page only; no machine-export merged)"
+  ]
+}

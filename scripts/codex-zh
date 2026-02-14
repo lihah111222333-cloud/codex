@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+TRANSLATOR="${REPO_ROOT}/dictionaries/meta/translate_codex_stream.py"
+
+if [[ ! -f "${TRANSLATOR}" ]]; then
+  echo "translator not found: ${TRANSLATOR}" >&2
+  exit 1
+fi
+
+CODEX_BIN="${CODEX_BIN:-codex}"
+DELTA_MODE="${CODEX_ZH_DELTA_MODE:-full-buffer}"
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  cat <<EOF
+Usage:
+  scripts/codex-zh [codex exec args...]
+
+Examples:
+  scripts/codex-zh "解释当前仓库结构"
+  scripts/codex-zh --model gpt-5 "检查最近变更"
+
+Notes:
+  - This wrapper runs: codex exec --json ... | translate_codex_stream.py
+  - Change delta mode via CODEX_ZH_DELTA_MODE=chunk|full-buffer
+  - Override codex binary via CODEX_BIN=/path/to/codex
+EOF
+  exit 0
+fi
+
+"${CODEX_BIN}" exec --json "$@" \
+  | python3 "${TRANSLATOR}" --mode jsonl --delta-mode "${DELTA_MODE}"

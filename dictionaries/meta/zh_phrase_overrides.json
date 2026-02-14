@@ -1,0 +1,17 @@
+{
+  "Waiting for instructions": "等待指示",
+  "Working": "工作中",
+  "Switching to grep for search": "切换为 grep 搜索",
+  "Planning peer discussion analysis": "规划同伴讨论分析",
+  "Planning implementation": "规划实现",
+  "Analyzing": "分析中",
+  "Thinking": "思考中",
+  "Reviewing": "审阅中",
+  "Searching": "搜索中",
+  "Loading": "加载中",
+  "Building": "构建中",
+  "Compiling": "编译中",
+  "Applying patch": "应用补丁",
+  "Preparing patch": "准备补丁",
+  "Waiting for": "等待"
+}
